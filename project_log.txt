@@ -1,0 +1,10 @@
+Starting off, downloaded DREANNS dataset
+	Note the license on this -- not allowed to redistribute
+	In future will need to have instructions on how to get
+
+Meeting 24th Oct morning
+	Discussed Shaes work visualizing
+	Basic flask app at this point
+	going to work on onset detction
+	use librosa for MIR tasks
+
