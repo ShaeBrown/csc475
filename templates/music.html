@@ -1,0 +1,17 @@
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.5/howler.core.min.js"></script>
+	<script src="{{ url_for('static', filename='js/visualization.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/music_control.js') }}"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/music.css') }}">
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+</head>
+<body>
+<script type="text/javascript">
+	var filename = "{{ url_for('static', filename='test_data/fort_minor-remember_the_name_127-245/fort_minor-remember_the_name_127-145_with_effects.mp3') }}";
+	var vis = $("body").visualization({drum_data: {{drum_events|tojson|safe}}});
+	var music_control = $("body").music_control({sound_file: filename, visualizer: vis});
+</script>
+</body>
