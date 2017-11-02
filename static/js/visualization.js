@@ -1,9 +1,9 @@
 $.widget("custom.visualization", {
     options: {
         drum_data: {},
-        width: 1000,
         height: 100,
-        song_length: 18000,
+        song_length: 18,
+        zoom_rate: 1,
         drum_props: {
             "Snare drum": {
                 color: "green",
@@ -17,20 +17,24 @@ $.widget("custom.visualization", {
     },
 
     _create: function() {
-
+        this.width = this.options.song_length * this.options.zoom_rate * 1000;
         this.svgContainer = d3.select('body')
             .append('svg')
             .attr('class', 'visualization')
-            .attr('width', this.options.width)
+            .attr('width', this.width)
             .attr('height', this.options.height);
 
-       this.svgContainer.append("line")
+        this.svgContainer.append("line")
             .attr("y1", 0)
             .attr("y2", this.options.height)
             .attr("x1", 0)
             .attr("x2", 1)
             .attr("stroke-width", 2)
             .attr("stroke", "black");
+
+        this.scale = d3.scaleLinear()
+            .domain([0, this.options.song_length])
+            .range([0, this.width]);
 
         var drum_circles = this._get_circle_data(this.options.drum_data);
         this.circles = this.svgContainer.append("g").selectAll("circle")
@@ -42,22 +46,38 @@ $.widget("custom.visualization", {
             .attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; })
             .attr("r", function(d) { return d.radius; })
-            .attr("class", function(d) {return d.c; })
+            .attr("class", function(d) { return d.c; })
             .style("fill", function(d) { return d.color; });
 
-        var scale = d3.scaleLinear()
-            .domain([0, this.options.song_length])
-            .range([0, this.options.song_length]);
-
-        var xAxis = d3.axisBottom(scale)
-            .ticks(18)
+        var xAxis = d3.axisBottom(this.scale)
+            .ticks(this.options.song_length * this.options.zoom_rate * 100)
+            .tickSize(10)
             .tickFormat(function(d) {
-                var minutes = Math.floor(d / 60000);
-                var seconds = ((d % 60000) / 1000).toFixed(0);
-                return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+                var milli = (d * 1000 % 1000).toFixed(0);
+                var seconds = d.toFixed(0);
+                if (milli == 0) {
+                    return seconds + "s";
+                } else if (milli % 100 == 0) {
+                    return milli;
+                } else {
+                    "";
+                }
             });
 
         this.axis = this.svgContainer.append("g").call(xAxis);
+        d3.selectAll(".tick line")
+            .attr("y2", function(d) {
+                var milli = (d * 1000 % 1000).toFixed(0);
+                if (milli == 0) {
+                    return 12;
+                } else if (milli % 100 == 0) {
+                    return 10;
+                } else if  (milli % 10 == 0) {
+                    return 5;
+                } else {
+                    return 2;
+                }
+            });
     },
 
     _get_circle_data: function(drum_events) {
@@ -67,12 +87,12 @@ $.widget("custom.visualization", {
                 var radius = this.options.drum_props[drum_type].radius;
                 var color = this.options.drum_props[drum_type].color;
                 jsonCircles.push({
-                    "x": time * 1000,
+                    "x": this.scale(time),
                     "y": this.options.height / 2,
                     "radius": radius,
                     "color": color,
                     "c": drum_type
-                })
+                });
             }, this);
         }, this);
         return jsonCircles;
@@ -83,16 +103,16 @@ $.widget("custom.visualization", {
         this.axis.transition();
     },
 
-    seek: function(milliseconds) {
+    seek: function(seconds) {
         this.circles
             .transition()
             .duration(0.1)
-            .attr("transform", "translate(" + -milliseconds + ")");
+            .attr("transform", "translate(" + -this.scale(seconds) + ")");
 
         this.axis
             .transition()
             .duration(0.1)
-            .attr("transform", "translate(" + -milliseconds + ")");
+            .attr("transform", "translate(" + -this.scale(seconds) + ")");
     },
 
     stop: function() {

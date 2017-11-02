@@ -30,13 +30,13 @@ $.widget("custom.music_control", {
             step: 0.001,
             stop: function(event, ui) {
                 self.sound.seek(ui.value / 1000);
-                self.set_slider(self.sound.seek() * 1000);
+                self.set_slider(self.sound.seek());
                 if (self.sound.playing()) {
                     self.start_progress();
                 }
             },
             slide: function(event, ui) {
-                self.options.visualizer.visualization('seek', ui.value);
+                self.options.visualizer.visualization('seek', ui.value / 1000);
                 self.set_time(ui.value);
             },
             start: function() {
@@ -80,7 +80,7 @@ $.widget("custom.music_control", {
         this.options.progresser = setInterval(function() {
             var milli = self.sound.seek() * 1000;
             self.set_slider(milli);
-            self.options.visualizer.visualization('seek', milli);
+            self.options.visualizer.visualization('seek', self.sound.seek());
             self.set_time(milli);
         }, 1);
     },
@@ -101,5 +101,9 @@ $.widget("custom.music_control", {
         var milli = (value%1000).toFixed(0);
         var seconds = (value/1000).toFixed(0);
         return seconds + ":" + milli;
+    },
+
+    set_rate: function(rate) {
+        this.sound.rate(rate);
     }
 });
