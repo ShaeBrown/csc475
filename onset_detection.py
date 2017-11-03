@@ -13,8 +13,8 @@ def main():
         #print("Usage: python onset_detection.py infile.wav")
         #sys.exit(0)
         infile = "../MASS/kismet-tv_on (indie-rock)/kismet-tv_on_0-24_without_effects.wav"
-
-    print(OnsetDetect(infile))
+    input_audio, sample_rate = librosa.load(infile)
+    print(OnsetDetect(input_audio, sample_rate).get_times())
 
 
 class OnsetDetect(object):
@@ -22,16 +22,28 @@ class OnsetDetect(object):
     In the future we can use this paper to implement, if we think it wil lgather better results
     http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.67.5843&rep=rep1&type=pdf
     '''
-    def __init__(self, infile):
-        input_audio, sample_rate = librosa.load(infile)
-        self.input_audio = input_audio
-        self.sample_rate = sample_rate
+    def __init__(self, audio, sr):
+        self.input_audio = audio
+        self.sample_rate = sr
         self.od_result = librosa.onset.onset_detect(y=self.input_audio,
                                                     units='time',
-                                                    sr=sample_rate,
+                                                    sr=self.sample_rate,
                                                     backtrack=False)
-        print(self.od_result)
 
+    def get_times(self):
+        return self.od_result
+
+    def get_onset_clips(self, duration):
+        """
+        Get audio clips in length duration (seconds) following detected onsets
+        :param duration: length of clip in seconds
+        :return: array of audio clips
+        """
+        sample_width = int(librosa.core.time_to_samples([duration], self.sample_rate)[0])
+        clips = []
+        for sample in librosa.core.time_to_samples(self.od_result):
+            clips.append(self.input_audio[sample: sample + sample_width])
+        return clips
 
 if __name__ == "__main__":
     main()
