@@ -3,7 +3,6 @@ import numpy as np
 import sys
 from scipy import signal
 from scipy import stats
-from sklearn import preprocessing
 from onset_detection import OnsetDetect
 
 
@@ -102,7 +101,6 @@ class FeatureExtraction:
         return self
 
     def get_feature_matrix(self):
-        norm = preprocessing.normalize(self.features, axis=0)
         return np.transpose(np.array(self.features))
 
 if __name__ == "__main__":
