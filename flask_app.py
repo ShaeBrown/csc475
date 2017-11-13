@@ -4,12 +4,6 @@ import re
 
 app = Flask(__name__)
 
-classes = {"Bass drum", "Bongo", "Chinese ride cymbal",
-           "Clave", "Cowbell", "Crash cymbal", "Crash cymbal 2",
-           "Cross stick", "Hi-hat closed", "Hi-hat open", "Low tom",
-           "Lowest tom", "Mid tom", "Ride cymbal", "Shaker", "Snare drum",
-           "Snare drum brush", "Snare rim shot", "Splash cymbal", "Tambourine", "Timbala", "Timbala rim shot"}
-
 @app.route('/testing')
 def get_test():
     path = "./static/test_data/fort_minor-remember_the_name_127-145/"
