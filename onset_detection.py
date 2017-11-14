@@ -28,7 +28,7 @@ class OnsetDetect(object):
         self.od_result = librosa.onset.onset_detect(y=self.input_audio,
                                                     units='time',
                                                     sr=self.sample_rate,
-                                                    backtrack=False)
+                                                    backtrack=True)
 
     def get_times(self):
         return self.od_result
