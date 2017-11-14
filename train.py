@@ -17,6 +17,7 @@ classes = ["Bass drum", "Bongo", "Chinese ride cymbal",
            "Lowest tom", "Mid tom", "Ride cymbal", "Shaker", "Snare drum",
            "Snare drum brush", "Snare rim shot", "Splash cymbal", "Tambourine", "Timbala", "Timbala rim shot"]
 
+
 def get_total_events(train_folder):
     total = 0
     for folder in os.listdir(train_folder):
@@ -43,6 +44,7 @@ def get_truth(folder, time):
                             break
     return truth
 
+
 def get_data():
     train_folder = "./static/test_data"
     X = []
@@ -53,7 +55,7 @@ def get_data():
                 song, sr = librosa.core.load(os.path.join(train_folder, folder, file))
                 onset = OnsetDetect(song, sr)
                 nyq = sr/2
-                f = FeatureExtraction(onset.get_onset_clips(0.001), sr)\
+                f = FeatureExtraction(onset.get_onset_clips(0.01), sr)\
                     .with_spectral_centroid()\
                     .with_zero_crossing_rate()\
                     .with_rms()\
@@ -80,6 +82,7 @@ def get_data():
                                                                                 get_total_events(train_folder)))
     return np.array(X), y
 
+
 def print_report(truth, pred, folds=10):
     print("Using cross validation with ", folds, "folds")
     print("Label ranking average precision: ",  metrics.label_ranking_average_precision_score(truth, pred))
@@ -98,8 +101,10 @@ def print_report(truth, pred, folds=10):
             results.append("n/a")
         else:
             results.append("%.3f" % metrics.recall_score(c_truth, c_pred))
+        results.append(np.sum(c_truth))
         class_results.append(results)
-    print(tabulate(class_results, headers=["Class", "Accuracy", "Precision", "Recall"]))
+    print(tabulate(class_results, headers=["Class", "Accuracy", "Precision", "Recall", "Samples"]))
+
 
 def test_model(clf, X, y, folds=10):
     skf = KFold(n_splits=folds)
@@ -114,6 +119,7 @@ def test_model(clf, X, y, folds=10):
         pred.extend(p)
     return truth, pred
 
+
 def train():
     X, y = get_data()
     clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(15,))
@@ -124,6 +130,7 @@ def train():
     if export:
         print("Enter file name")
         file = input()
+        clf.fit(X, y)
         joblib.dump(clf, './trained_models/' + file + '.pkl')
         print("Exported model " + file + " in trained models")
 
