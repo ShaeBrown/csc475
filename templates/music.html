@@ -10,7 +10,7 @@
 </head>
 <body>
 <script type="text/javascript">
-	var filename = "{{ url_for('static', filename='test_data/fort_minor-remember_the_name_127-245/fort_minor-remember_the_name_127-145_with_effects.mp3') }}";
+	var filename = "{{ url_for('static', filename='test_data/fort_minor-remember_the_name_127-145/fort_minor-remember_the_name_127-145_with_effects.wav') }}";
 	var vis = $("body").visualization({drum_data: {{drum_events|tojson|safe}}});
 	var music_control = $("body").music_control({sound_file: filename, visualizer: vis});
 </script>
