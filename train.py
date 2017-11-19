@@ -52,6 +52,7 @@ def get_data():
     for folder in os.listdir(train_folder):
         for file in os.listdir(os.path.join(train_folder, folder)):
             if file.endswith(".wav") or file.endswith(".mp3"):
+                print("Training on file {}".format(file))
                 song, sr = librosa.core.load(os.path.join(train_folder, folder, file))
                 onset = OnsetDetect(song, sr)
                 nyq = sr/2
