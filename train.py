@@ -11,12 +11,7 @@ from sklearn import metrics
 from sklearn.externals import joblib
 from tabulate import tabulate
 
-classes = ["Bass drum", "Bongo", "Chinese ride cymbal",
-           "Clave", "Cowbell", "Crash cymbal", "Crash cymbal 2",
-           "Cross stick", "Hi-hat closed", "Hi-hat open", "Low tom",
-           "Lowest tom", "Mid tom", "Ride cymbal", "Shaker", "Snare drum",
-           "Snare drum brush", "Snare rim shot", "Splash cymbal", "Tambourine", "Timbala", "Timbala rim shot"]
-
+classes = ["Bass drum", "Hi-hat closed", "Hi-hat open", "Snare drum"]
 
 def get_total_events(train_folder):
     total = 0
