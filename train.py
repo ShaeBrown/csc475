@@ -27,14 +27,14 @@ def get_total_events(train_folder):
 
 def get_truth(folder, time):
     truth = []
-    time = round(time, 0)
     for c in classes:
         path = os.path.join(folder, c + ".txt")
         if os.path.isfile(path):
             with open(path, "r") as file:
                 for line in file:
                     for t in re.findall(r"\d+\.\d+", line):
-                        if round(float(t), 0) == time:
+                        # TODO: find an appropriate approx error here
+                        if float(t) - time < 0.2 and float(t) - time > -0.1:
                             truth.append(c)
                             break
     return truth
@@ -44,6 +44,7 @@ def get_data():
     train_folder = "./static/test_data"
     X = []
     y = []
+    total_matches = 0
     for folder in os.listdir(train_folder):
         for file in os.listdir(os.path.join(train_folder, folder)):
             if file.endswith(".wav") or file.endswith(".mp3"):
@@ -64,15 +65,15 @@ def get_data():
                     .with_spectral_flatness()\
                     .with_mfcc()\
                     .get_feature_matrix()
+
                 t = []
-                total_matches = 0
                 for time in onset.get_times():
                     truth = get_truth(os.path.join(train_folder, folder), time)
                     t.append(truth)
                     total_matches += len(truth)
                 X.extend(f)
                 y.extend(t)
-                break
+
     y = MultiLabelBinarizer(classes=classes).fit_transform(y)
     print("Onset detection captured {0} out of {1} training data events".format(total_matches, \
                                                                                 get_total_events(train_folder)))
