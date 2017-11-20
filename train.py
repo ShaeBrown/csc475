@@ -17,7 +17,7 @@ def get_total_events(train_folder):
     total = 0
     for folder in os.listdir(train_folder):
         for file in os.listdir(os.path.join(train_folder, folder)):
-            if file.endswith(".txt"):
+            if file.endswith(".txt") and file.startswith(tuple(classes)):
                 with open(os.path.join(train_folder, folder, file)) as f:
                     for i, line in enumerate(f):
                         pass
@@ -33,7 +33,7 @@ def get_truth(folder, time):
         if os.path.isfile(path):
             with open(path, "r") as file:
                 for line in file:
-                    for t in re.findall("\d+\.\d+", line):
+                    for t in re.findall(r"\d+\.\d+", line):
                         if round(float(t), 0) == time:
                             truth.append(c)
                             break
