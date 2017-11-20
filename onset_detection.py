@@ -13,7 +13,7 @@ def main():
     if len(sys.argv) == 2:
         infile = sys.argv[1]
     else:
-        infile = "../MASS/kismet-tv_on (indie-rock)/kismet-tv_on_0-24_without_effects.wav"
+        infile = "./static/test_data/kismet-tv_on_0-24/kismet-tv_on_0-24_without_effects.mp3"
 
     input_audio, sample_rate = librosa.load(infile)
     od = OnsetDetect(input_audio, sample_rate)
@@ -39,7 +39,7 @@ class OnsetDetect(object):
         return librosa.onset.onset_detect(onset_envelope=onset_env,
                                           units='time',
                                           sr=self.sample_rate,
-                                          backtrack=False)
+                                          backtrack=True)
 
     def get_times(self):
         ''' Returns the onset detection peaks as a 1-d array (in seconds)'''
