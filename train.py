@@ -11,18 +11,13 @@ from sklearn import metrics
 from sklearn.externals import joblib
 from tabulate import tabulate
 
-classes = ["Bass drum", "Bongo", "Chinese ride cymbal",
-           "Clave", "Cowbell", "Crash cymbal", "Crash cymbal 2",
-           "Cross stick", "Hi-hat closed", "Hi-hat open", "Low tom",
-           "Lowest tom", "Mid tom", "Ride cymbal", "Shaker", "Snare drum",
-           "Snare drum brush", "Snare rim shot", "Splash cymbal", "Tambourine", "Timbala", "Timbala rim shot"]
-
+classes = ["Bass drum", "Hi-hat closed", "Hi-hat open", "Snare drum"]
 
 def get_total_events(train_folder):
     total = 0
     for folder in os.listdir(train_folder):
         for file in os.listdir(os.path.join(train_folder, folder)):
-            if file.endswith(".txt"):
+            if file.endswith(".txt") and file.startswith(tuple(classes)):
                 with open(os.path.join(train_folder, folder, file)) as f:
                     for i, line in enumerate(f):
                         pass
@@ -32,14 +27,14 @@ def get_total_events(train_folder):
 
 def get_truth(folder, time):
     truth = []
-    time = round(time, 0)
     for c in classes:
         path = os.path.join(folder, c + ".txt")
         if os.path.isfile(path):
             with open(path, "r") as file:
                 for line in file:
-                    for t in re.findall("\d+\.\d+", line):
-                        if round(float(t), 0) == time:
+                    for t in re.findall(r"\d+\.\d+", line):
+                        # TODO: find an appropriate approx error here
+                        if float(t) - time < 0.2 and float(t) - time > -0.1:
                             truth.append(c)
                             break
     return truth
@@ -49,13 +44,15 @@ def get_data():
     train_folder = "./static/test_data"
     X = []
     y = []
+    total_matches = 0
     for folder in os.listdir(train_folder):
         for file in os.listdir(os.path.join(train_folder, folder)):
             if file.endswith(".wav") or file.endswith(".mp3"):
+                print("Training on file {}".format(file))
                 song, sr = librosa.core.load(os.path.join(train_folder, folder, file))
                 onset = OnsetDetect(song, sr)
                 nyq = sr/2
-                f = FeatureExtraction(onset.get_onset_clips(0.01), sr)\
+                f = FeatureExtraction(onset.get_onset_clips(0.02), sr)\
                     .with_spectral_centroid()\
                     .with_zero_crossing_rate()\
                     .with_rms()\
@@ -68,15 +65,15 @@ def get_data():
                     .with_spectral_flatness()\
                     .with_mfcc()\
                     .get_feature_matrix()
+
                 t = []
-                total_matches = 0
                 for time in onset.get_times():
                     truth = get_truth(os.path.join(train_folder, folder), time)
                     t.append(truth)
                     total_matches += len(truth)
                 X.extend(f)
                 y.extend(t)
-                break
+
     y = MultiLabelBinarizer(classes=classes).fit_transform(y)
     print("Onset detection captured {0} out of {1} training data events".format(total_matches, \
                                                                                 get_total_events(train_folder)))
