@@ -31,7 +31,6 @@ $.widget("custom.music_control", {
             step: 0.001,
             stop: function(event, ui) {
                 self.sound.seek(ui.value / 1000);
-                self.set_slider(self.sound.seek());
                 if (self.sound.playing()) {
                     self.start_progress();
                 }
