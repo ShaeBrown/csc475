@@ -3,7 +3,7 @@ $.widget("custom.visualization", {
         drum_data: {},
         height: 100,
         song_length: 18,
-        zoom_rate: 1,
+        zoom_rate: 0.5,
         drum_props: {
             "Snare drum": {
                 color: "green",
@@ -12,13 +12,21 @@ $.widget("custom.visualization", {
             "Bass drum": {
                 color: "blue",
                 radius: 20
+            },
+            "Hi-hat closed": {
+                color: "pink",
+                radius: 10
+            },
+            "Hi-hat open": {
+                color: "green",
+                radius: 10
             }
         }
     },
 
     _create: function() {
         this.width = this.options.song_length * this.options.zoom_rate * 1000;
-        this.svgContainer = d3.select('body')
+        this.svgContainer = d3.select('#visualization')
             .append('svg')
             .attr('class', 'visualization')
             .attr('width', this.width)

@@ -53,8 +53,12 @@ class OnsetDetect(object):
         """
         sample_width = int(librosa.core.time_to_samples([duration], self.sample_rate)[0])
         clips = []
-        for sample in librosa.core.time_to_samples(self.od_result):
-            clips.append(self.input_audio[sample: sample + sample_width])
+        for i, sample in enumerate(librosa.core.time_to_samples(self.od_result, self.sample_rate)):
+            clip = self.input_audio[sample: sample + sample_width]
+            if len(clip) > 0:
+                clips.append(clip)
+            else:
+                self.od_result.remove(i)
         return clips
 
     def visualize(self):

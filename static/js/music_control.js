@@ -1,8 +1,8 @@
 $.widget("custom.music_control", {
     options: {
         sound_file: "",
-        visualizer: {},
-        progresser: ""
+        progresser: "",
+        onload: {}
     },
 
     _create: function() {
@@ -11,6 +11,7 @@ $.widget("custom.music_control", {
             src: [this.options.sound_file],
             format: "mp3",
             onload: function() {
+                self.options.onload(self);
                 self.create_slider(this.duration() * 1000);
             },
             onend: function() {
@@ -18,7 +19,7 @@ $.widget("custom.music_control", {
             }
         });
         this.create_buttons();
-        $("body").append("<p id='time'></p>");
+        $("#music_control").append("<p id='time'></p>");
 
     },
 
@@ -30,13 +31,12 @@ $.widget("custom.music_control", {
             step: 0.001,
             stop: function(event, ui) {
                 self.sound.seek(ui.value / 1000);
-                self.set_slider(self.sound.seek());
                 if (self.sound.playing()) {
                     self.start_progress();
                 }
             },
             slide: function(event, ui) {
-                self.options.visualizer.visualization('seek', ui.value / 1000);
+                self.visualizer.visualization('seek', ui.value / 1000);
                 self.set_time(ui.value);
             },
             start: function() {
@@ -47,14 +47,13 @@ $.widget("custom.music_control", {
 
     create_buttons: function() {
 
-        $("body").append("<div class='controls'>" +
+        $("#music_control").append("<div class='controls'>" +
             "<button id='play'>Play</button>" +
             "<button id='pause'>Pause</button>" +
             "<button id='stop'>Stop</button>" +
             "<div id='slider'></div>");
 
         var self = this;
-        var visualizer = this.options.visualizer;
         $("#play").on("click", function() {
             if (!self.sound.playing()) {
                 self.sound.play();
@@ -64,13 +63,13 @@ $.widget("custom.music_control", {
 
         $("#pause").on("click", function() {
             self.sound.pause();
-            visualizer.visualization('pause');
+            self.visualizer.visualization('pause');
             self.pause_progress();
         });
 
         $("#stop").on("click", function() {
             self.sound.stop();
-            visualizer.visualization('stop');
+            self.visualizer.visualization('stop');
             self.set_slider(0);
         });
     },
@@ -80,7 +79,7 @@ $.widget("custom.music_control", {
         this.options.progresser = setInterval(function() {
             var milli = self.sound.seek() * 1000;
             self.set_slider(milli);
-            self.options.visualizer.visualization('seek', self.sound.seek());
+            self.visualizer.visualization('seek', self.sound.seek());
             self.set_time(milli);
         }, 1);
     },
@@ -103,7 +102,15 @@ $.widget("custom.music_control", {
         return seconds + ":" + milli;
     },
 
+    get_song_length: function() {
+        return this.sound.duration();
+    },
+
+    set_visualizer: function(vis) {
+        this.visualizer = vis
+    },
+
     set_rate: function(rate) {
-        this.sound.rate(rate);
+         this.sound.rate(rate);
     }
 });
