@@ -17,7 +17,7 @@ class FeatureExtraction:
         for onset in self.audio_clips:
             crossings = librosa.feature.zero_crossing_rate(y=onset,
                                                            frame_length=len(onset))
-            crossing_rate.append(crossings[0])
+            crossing_rate.append(crossings[0][0])
         self.features.append(crossing_rate)
         return self
 
@@ -33,7 +33,7 @@ class FeatureExtraction:
         rms = []
         for onset in self.audio_clips:
             r = librosa.feature.rmse(y=onset, frame_length=len(onset))
-            rms.append(r[0])
+            rms.append(r[0][0])
         self.features.append(rms)
         return self
 
@@ -44,7 +44,7 @@ class FeatureExtraction:
         for onset in self.audio_clips:
             y = signal.lfilter(b, a, onset)
             r = librosa.feature.rmse(y=y, frame_length=len(onset))
-            rms.append(r[0])
+            rms.append(r[0][0])
         self.features.append(rms)
         return self
 
@@ -96,7 +96,7 @@ class FeatureExtraction:
         mfcc = []
         for onset in self.audio_clips:
             c = librosa.feature.mfcc(y=onset, sr=self.sr, n_mfcc=1)
-            mfcc.append(c[0])
+            mfcc.append(c[0][0])
         self.features.append(mfcc)
         return self
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         .with_rms()\
         .with_rms_of_filter(np.divide([49, 50], nyq), np.divide([0.01, 2000], nyq), 0.01, 62)\
         .with_rms_of_filter(np.divide([200, 201], nyq), np.divide([1, 1300], nyq), 0.01, 20)\
-        .with_rms_of_filter(np.divide([5100, 16300], nyq), np.divide([65, 22000],nyq), 0.05, 60)\
+        .with_rms_of_filter(np.divide([5100, 16300], nyq), np.divide([65, 22000], nyq), 0.05, 60)\
         .with_spectral_kurtosis()\
         .with_spectral_skewness()\
         .with_spectral_rolloff()\
