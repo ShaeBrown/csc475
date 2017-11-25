@@ -5,6 +5,8 @@ import numpy as np
 from feature_extraction import FeatureExtraction
 from onset_detection import OnsetDetect
 from sklearn.neural_network import MLPClassifier
+import sklearn.ensemble
+import sklearn
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn import metrics
@@ -54,7 +56,7 @@ def get_data():
                 song, sr = librosa.core.load(os.path.join(train_folder, folder, file))
                 onset = OnsetDetect(song, sr)
                 nyq = sr / 2
-                f = FeatureExtraction(onset.get_onset_clips(0.01), sr) \
+                f = FeatureExtraction(onset.get_onset_clips(0.02), sr) \
                     .with_spectral_centroid() \
                     .with_zero_crossing_rate() \
                     .with_rms() \
@@ -122,7 +124,7 @@ def test_model(clf, X, y, folds=10):
 
 def train():
     X, y = get_data()
-    clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(15,))
+    clf = sklearn.tree.DecisionTreeClassifier()
     truth, pred = test_model(clf, X, y)
     print_report(truth, pred)
     print("Would you like to export this trained model? [y/n]")
