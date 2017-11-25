@@ -2,6 +2,8 @@ from sklearn.externals import joblib
 import numpy as np
 from onset_detection import OnsetDetect
 from feature_extraction import FeatureExtraction
+import os
+import librosa
 
 classes = ["Bass drum", "Hi-hat closed", "Hi-hat open", "Snare drum"]
 
@@ -35,3 +37,8 @@ class DrumAnnotation:
         for i, drum_class in enumerate(classes):
             class_times[drum_class] = times[np.nonzero(y[:, i])].tolist()
         return class_times
+
+if __name__ == '__main__':
+    D = DrumAnnotation('trained_models/nov24.pkl')
+    song, sr = librosa.core.load('static/test_data/fort_minor-remember_the_name_127-145/fort_minor-remember_the_name_127-145_with_effects.wav')
+    print(D.get_drum_prediction_times(song, sr))
