@@ -106,7 +106,7 @@ class FeatureExtraction:
 if __name__ == "__main__":
     infile = sys.argv[1]
     audio, sample_rate = librosa.load(infile)
-    onset_clips = OnsetDetect(audio, sample_rate).get_onset_clips(0.001)
+    onset_clips = OnsetDetect(audio, sample_rate).get_onset_clips(0.2)
     nyq = sample_rate/2
     X = FeatureExtraction(onset_clips, sample_rate)\
         .with_spectral_centroid()\
