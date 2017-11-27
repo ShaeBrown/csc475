@@ -9,7 +9,7 @@ UPLOAD_FOLDER = "./static/uploads"
 ALLOWED_EXTENSIONS = {'mp3', 'wav'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-annotator = DrumAnnotation("./trained_models/nov23.pkl")
+annotator = DrumAnnotation("./trained_models/nov26.pkl")
 
 
 def allowed_file(filename):
@@ -55,4 +55,5 @@ def get_test():
                 times.append(float(re.findall("\d+\.\d+", line)[0]))
             drum_events[drum] = times
             annotation.close()
+    print(drum_events)
     return render_template("music.html", file_name=url_for('static', filename=file), drum_events=drum_events)
