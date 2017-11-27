@@ -18,7 +18,7 @@ $.widget("custom.visualization", {
                 radius: 10
             },
             "Hi-hat open": {
-                color: "green",
+                color: "orange",
                 radius: 10
             }
         }
