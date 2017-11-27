@@ -1,25 +1,29 @@
 $.widget("custom.visualization", {
     options: {
         drum_data: {},
-        height: 100,
+        widget_height: 100,
         song_length: 18,
         zoom_rate: 0.5,
         drum_props: {
             "Snare drum": {
                 color: "green",
-                radius: 10
+                radius: 10,
+                height: 30
             },
             "Bass drum": {
                 color: "blue",
-                radius: 20
+                radius: 10,
+                height: 50
             },
             "Hi-hat closed": {
                 color: "pink",
-                radius: 10
+                radius: 10,
+                height: 70
             },
             "Hi-hat open": {
                 color: "orange",
-                radius: 10
+                radius: 10,
+                height: 90
             }
         }
     },
@@ -30,11 +34,11 @@ $.widget("custom.visualization", {
             .append('svg')
             .attr('class', 'visualization')
             .attr('width', this.width)
-            .attr('height', this.options.height);
+            .attr('height', this.options.widget_height);
 
         this.svgContainer.append("line")
             .attr("y1", 0)
-            .attr("y2", this.options.height)
+            .attr("y2", this.options.widget_height)
             .attr("x1", 0)
             .attr("x2", 1)
             .attr("stroke-width", 2)
@@ -94,9 +98,10 @@ $.widget("custom.visualization", {
             drum_events[drum_type].forEach(function(time) {
                 var radius = this.options.drum_props[drum_type].radius;
                 var color = this.options.drum_props[drum_type].color;
+                var height = this.options.drum_props[drum_type].height;
                 jsonCircles.push({
                     "x": this.scale(time),
-                    "y": this.options.height / 2,
+                    "y": height,
                     "radius": radius,
                     "color": color,
                     "c": drum_type
