@@ -39,6 +39,6 @@ class DrumAnnotation:
         return class_times
 
 if __name__ == '__main__':
-    D = DrumAnnotation('trained_models/nov24.pkl')
+    D = DrumAnnotation('trained_models/nov26.pkl')
     song, sr = librosa.core.load('static/test_data/fort_minor-remember_the_name_127-145/fort_minor-remember_the_name_127-145_with_effects.wav')
     print(D.get_drum_prediction_times(song, sr))
