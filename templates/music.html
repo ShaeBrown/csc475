@@ -1,23 +1,27 @@
 <head>
-	<script src="https://d3js.org/d3.v4.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.5/howler.core.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.5/howler.core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.4.0/wavesurfer.min.js"></script>
-	<script src="{{ url_for('static', filename='js/visualization.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/music_control.js') }}"></script>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/music.css') }}">
-	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="{{ url_for('static', filename='js/visualization.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/music_control.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/music.css') }}">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 </head>
 <body>
 <div id="visualization"></div>
 <div id="music_control"></div>
 <script type="text/javascript">
-        function load_visualization(music_control) {
-            var song_length = music_control.get_song_length();
-	        var vis = $("body").visualization({drum_data: {{drum_events|tojson|safe}}, song_length: song_length, song_path: "{{ file_name }}"});
-            music_control.set_visualizer(vis);
-        };
-    	var music_control = $("body").music_control({sound_file: "{{ file_name }}", onload: load_visualization});
+    function load_visualization(music_control) {
+        var song_length = music_control.get_song_length();
+        var vis = $("body").visualization({
+            drum_data: {{drum_events|tojson|safe}},
+            song_length: song_length,
+            song_path: "{{ file_name }}"
+        });
+        music_control.set_visualizer(vis);
+    }
+    var music_control = $("body").music_control({sound_file: "{{ file_name }}", onload: load_visualization});
 </script>
 </body>
