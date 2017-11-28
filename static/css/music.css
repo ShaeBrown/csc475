@@ -1,5 +1,5 @@
 .visualization {
-	overflow: visible;
+    overflow: visible;
     position: absolute;
     z-index: 2;
 }
@@ -9,7 +9,11 @@
     margin-top: 50px;
 }
 
-html, body {margin: 0; height: 100%; overflow: hidden}
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden
+}
 
 #music_control {
     margin: 50px;
