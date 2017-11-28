@@ -63,7 +63,6 @@ $.widget("custom.music_control", {
 
         $("#pause").on("click", function() {
             self.sound.pause();
-            self.visualizer.visualization('pause');
             self.pause_progress();
         });
 

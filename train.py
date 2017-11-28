@@ -56,7 +56,7 @@ def get_data():
                 song, sr = librosa.core.load(os.path.join(train_folder, folder, file))
                 onset = OnsetDetect(song, sr)
                 nyq = sr / 2
-                f = FeatureExtraction(onset.get_onset_clips(0.02), sr) \
+                f = FeatureExtraction(onset.get_onset_clips(0.1), sr) \
                     .with_spectral_centroid() \
                     .with_zero_crossing_rate() \
                     .with_rms() \

@@ -3,7 +3,9 @@ $.widget("custom.visualization", {
         drum_data: {},
         widget_height: 100,
         song_length: 18,
+        song_path : "",
         zoom_rate: 0.5,
+        wave_color: "LightGrey",
         drum_props: {
             "Snare drum": {
                 color: "green",
@@ -36,12 +38,14 @@ $.widget("custom.visualization", {
             .attr('width', this.width)
             .attr('height', this.options.widget_height);
 
-        this.svgContainer.append("line")
+        d3.select("#visualization").append("svg")
+            .attr("class", "fixed")
+            .append("line")
             .attr("y1", 0)
             .attr("y2", this.options.widget_height)
             .attr("x1", 0)
-            .attr("x2", 1)
-            .attr("stroke-width", 2)
+            .attr("x2", 0)
+            .attr("stroke-width", 3)
             .attr("stroke", "black");
 
         this.scale = d3.scaleLinear()
@@ -90,6 +94,13 @@ $.widget("custom.visualization", {
                     return 2;
                 }
             });
+
+        $("#visualization").width(this.width);
+        var wavesurfer = WaveSurfer.create({
+            container: '#visualization',
+            waveColor: this.options.wave_color
+        });
+        wavesurfer.load(this.options.song_path);
     },
 
     _get_circle_data: function(drum_events) {
@@ -111,24 +122,12 @@ $.widget("custom.visualization", {
         return jsonCircles;
     },
 
-    pause: function() {
-        this.circles.transition();
-        this.axis.transition();
-    },
-
     seek: function(seconds) {
-        this.circles
-            .transition()
-            .duration(0.1)
-            .attr("transform", "translate(" + -this.scale(seconds) + ")");
-
-        this.axis
-            .transition()
-            .duration(0.1)
-            .attr("transform", "translate(" + -this.scale(seconds) + ")");
+        $(".visualization").css("left", -this.scale(seconds) + 50); // 50 margin
+        $("wave").css("left", -this.scale(seconds));
     },
 
     stop: function() {
         this.seek(0);
-    },
+    }
 });
