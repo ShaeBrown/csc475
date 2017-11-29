@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, send_file
 import re
 import os
+import tempfile
+import json
 import librosa
 from werkzeug.utils import secure_filename
 from drum_annotation import DrumAnnotation
@@ -58,15 +60,27 @@ def get_test():
     print(drum_events)
     return render_template("music.html", file_name=url_for('static', filename=file), drum_events=drum_events)
 
+
 @app.route('/export', methods=['POST'])
 def export_data():
     '''
     Receive the drum events and some meta data as a POST
     Build the output around these
     '''
-    print(request.form) # get the form items
-    print(request.form['drum_events'])
-    # Send the constructed file back
-    return send_file('./static/uploads/test.txt',
-                     mimetype='"application/octet-stream"',
-                     as_attachment=True)
+    output_format = request.form['output_format']
+    drum_events = json.loads(request.form['drum_events'])
+    output_file = request.form['output_filename']
+    try:
+        separate_classes = request.form['separate_classes']
+    except KeyError:
+        separate_classes = False
+
+    with open(UPLOAD_FOLDER + '/' + output_file, mode='w+') as f:
+        for event_class, times in drum_events.items():
+            for event_time in times:
+                f.write(output_format.format(time=event_time, type=event_class))
+                f.write('\n')
+    return send_file(UPLOAD_FOLDER + '/' + output_file,
+                    mimetype='"application/octet-stream"',
+                    attachment_filename=request.form['output_filename'],
+                    as_attachment=True)
