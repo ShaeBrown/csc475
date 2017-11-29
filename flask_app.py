@@ -60,4 +60,10 @@ def get_test():
 
 @app.route('/export', methods=['POST'])
 def export_data():
+    '''
+    Receive the drum events and some meta data as a POST
+    Build the output around these
+    '''
+    print(request.form) # get the form items
+    print(request.data) # get the attached times
     return send_file('./static/uploads/test.txt', as_attachment=True)
