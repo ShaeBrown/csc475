@@ -52,8 +52,9 @@ $.widget("custom.export_controls", {
     export_data: function() {
         // This calls from the context of the submit button
         var form = $("form").serializeArray();
+        var drum_times = $('body').visualization('get_all_drum_times');
         form.push({name: 'drum_events',
-                   value: $('body').visualization('get_all_drum_times')})
+                   value: JSON.stringify(drum_times)})
 
         $.post(action, form, function (result) {
             // https://stackoverflow.com/a/26129406/4234532
