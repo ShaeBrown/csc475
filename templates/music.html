@@ -15,9 +15,10 @@
 <div id="music_control"></div>
 <div id="export_control"></div>
 <script type="text/javascript">
+    var vis = null;
     function load_visualization(music_control) {
         var song_length = music_control.get_song_length();
-        var vis = $("body").visualization({
+        vis = $("body").visualization({
             drum_data: {{drum_events|tojson|safe}},
             song_length: song_length,
             song_path: "{{ file_name }}"

@@ -66,4 +66,8 @@ def export_data():
     '''
     print(request.form) # get the form items
     print(request.data) # get the attached times
-    return send_file('./static/uploads/test.txt', as_attachment=True)
+
+    # Send the constructed file back
+    return send_file('./static/uploads/test.txt',
+                     mimetype='"application/octet-stream"',
+                     as_attachment=True)

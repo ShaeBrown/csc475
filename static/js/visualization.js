@@ -129,5 +129,11 @@ $.widget("custom.visualization", {
 
     stop: function() {
         this.seek(0);
+    },
+
+    get_all_drum_times: function() {
+        // TODO: build dict of all of the drum times
+        return {'Bass drum': [11, 15],
+                'Snare drum': [33]}
     }
 });

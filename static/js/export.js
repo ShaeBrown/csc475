@@ -52,11 +52,17 @@ $.widget("custom.export_controls", {
     export_data: function() {
         // This calls from the context of the submit button
         var form = $("form").serializeArray();
-        console.log(form)
-        form.push({name: 'test', value: 'content'})
+        form.push({name: 'drum_events',
+                   value: $('body').visualization('get_all_drum_times')})
 
-        $.post(action, form, function(d) {
-            console.log(d)
+        $.post(action, form, function (result) {
+            // https://stackoverflow.com/a/26129406/4234532
+            var blob=new Blob([result]);
+            var link=document.createElement('a');
+            link.href=window.URL.createObjectURL(blob);
+            link.download="myFileName.txt";
+            link.click();
+        
         });
     }
 
