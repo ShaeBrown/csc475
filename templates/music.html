@@ -24,4 +24,18 @@
     }
     var music_control = $("body").music_control({sound_file: "{{ file_name }}", onload: load_visualization});
 </script>
+
+<div id='export_control'>
+    <form class='export_controls' action="{{ url_for('export_data') }}" method="post">
+        <label for='separate_classes' form='export_controls'>Separate Classes</label>
+        <input type='checkbox' id='separate_classes'>
+        <br>
+
+        <label for='output_format' form='export_controls'>Output Format</label>        
+        <input type='text' id='output_format' required value='{class}, {time}'>
+        <br>
+
+        <input type='submit' id='export_submit' value='Export'>        
+    </form>
+</div>
 </body>

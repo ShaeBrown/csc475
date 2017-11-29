@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, send_file
 import re
 import os
 import librosa
@@ -57,3 +57,7 @@ def get_test():
             annotation.close()
     print(drum_events)
     return render_template("music.html", file_name=url_for('static', filename=file), drum_events=drum_events)
+
+@app.route('/export', methods=['POST'])
+def export_data():
+    return send_file('./static/uploads/test.txt', as_attachment=True)
