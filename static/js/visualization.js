@@ -132,8 +132,16 @@ $.widget("custom.visualization", {
     },
 
     get_all_drum_times: function() {
-        // TODO: build dict of all of the drum times
-        return {'Bass drum': [11, 15],
-                'Snare drum': [33]}
+        var output = {}
+        // Init empty subobject for each class in properties
+        Object.keys(this.options.drum_props).forEach(function(key) {
+            output[key] = []
+        })
+        // Add every circles data to output
+        d3.selectAll("circle")._groups[0].forEach(function(circle) {
+			//console.log(circle.cx.baseVal.value) // TODO: convert this to s
+			output[circle.className.baseVal].push(circle.cx.baseVal.value)
+        })
+        return output
     }
 });
