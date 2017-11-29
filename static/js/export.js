@@ -82,18 +82,3 @@ $.widget("custom.export_controls", {
 
 })
 })(jQuery);
-/*
-$('#export_controls').submit(function() {
-    form = this.serializeArray();
-    
-    form = form.concat([
-        {name: "customer_id", value: window.username},
-        {name: "post_action", value: "Update Information"}
-    ]);
-    
-    $.post('/export', form, function(d) {
-        if (d.error) {
-            alert("There was a problem updating your user details")
-        } 
-    });
-});*/
