@@ -133,14 +133,23 @@ $.widget("custom.visualization", {
 
     get_all_drum_times: function() {
         var output = {}
+        var drum_props = this.options.drum_props
+        var song_length = this.options.song_length
+        var zoom_rate = this.options.zoom_rate
+        var width = song_length * zoom_rate * 1000;        
+        var x_to_t = d3.scaleLinear()
+            .domain([0, width])       
+            .range([0, song_length])
+
         // Init empty subobject for each class in properties
         Object.keys(this.options.drum_props).forEach(function(key) {
             output[key] = []
         })
         // Add every circles data to output
         d3.selectAll("circle")._groups[0].forEach(function(circle) {
-			//console.log(circle.cx.baseVal.value) // TODO: convert this to s
-			output[circle.className.baseVal].push(circle.cx.baseVal.value)
+            var x_val = circle.cx.baseVal.value
+            var x_time = x_to_t(x_val)
+			output[circle.className.baseVal].push(x_time)
         })
         return output
     }
