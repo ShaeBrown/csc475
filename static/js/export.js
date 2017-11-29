@@ -32,12 +32,25 @@ $.widget("custom.export_controls", {
                 name: 'output_format',
                 type: 'text',
                 required: true,
-                value: '{class}, {time}'
+                value: '{time}, {type}'
             }))
             .append($('<label>', {
                 for: 'output_format',
                 form: 'export_controls',
                 text:'Output Format'
+            }))
+            .append($('<div>'))
+            .append($('<input>', {
+                id: 'output_filename',
+                name: 'output_filename',
+                type: 'text',
+                required: true,
+                value: 'drum_events'
+            }))
+            .append($('<label>', {
+                for: 'output_filename',
+                form: 'export_controls',
+                text:'Output Filename'
             }))
             .append($('<div>'))
             .append($('<input>', {
@@ -61,7 +74,7 @@ $.widget("custom.export_controls", {
             var blob=new Blob([result]);
             var link=document.createElement('a');
             link.href=window.URL.createObjectURL(blob);
-            link.download="myFileName.txt";
+            link.download=$('#output_filename')[0].value;
             link.click();
         
         });
