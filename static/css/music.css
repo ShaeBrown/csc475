@@ -19,6 +19,10 @@ html, body {
     margin: 50px;
 }
 
+#export_control {
+    margin-left: 50px;
+}
+
 .fixed {
     position: absolute;
     z-index: 2;
