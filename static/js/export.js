@@ -45,7 +45,7 @@ $.widget("custom.export_controls", {
                 name: 'output_filename',
                 type: 'text',
                 required: true,
-                value: 'drum_events'
+                value: 'drum_events.txt'
             }))
             .append($('<label>', {
                 for: 'output_filename',
@@ -57,7 +57,7 @@ $.widget("custom.export_controls", {
                 id: 'export_submit',
                 type: 'submit',
                 value: 'Export'
-            }))
+            }));
         
         $('#export_submit').on('click', this.export_data);
     },
@@ -67,7 +67,7 @@ $.widget("custom.export_controls", {
         var form = $("form").serializeArray();
         var drum_times = $('body').visualization('get_all_drum_times');
         form.push({name: 'drum_events',
-                   value: JSON.stringify(drum_times)})
+                   value: JSON.stringify(drum_times)});
 
         $.post(action, form, function (result) {
             // https://stackoverflow.com/a/26129406/4234532
@@ -78,7 +78,5 @@ $.widget("custom.export_controls", {
             link.click();
         
         });
-    }
-
-})
+    }});
 })(jQuery);
