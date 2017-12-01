@@ -3,7 +3,7 @@ $.widget("custom.visualization", {
         drum_data: {},
         widget_height: 100,
         song_length: 18,
-        song_path: "",
+        song_path:"",
         zoom_rate: 0.5,
         wave_color: "LightGrey",
         drum_props: {
@@ -30,7 +30,7 @@ $.widget("custom.visualization", {
         }
     },
 
-    _create: function () {
+    _create: function() {
         this.width = this.options.song_length * this.options.zoom_rate * 1000;
         this.svgContainer = d3.select('#visualization')
             .append('svg')
@@ -70,7 +70,7 @@ $.widget("custom.visualization", {
         var xAxis = d3.axisBottom(this.scale)
             .ticks(this.options.song_length * this.options.zoom_rate * 100)
             .tickSize(10)
-            .tickFormat(function (d) {
+            .tickFormat(function(d) {
                 var milli = (d * 1000 % 1000).toFixed(0);
                 var seconds = d.toFixed(0);
                 if (milli == 0) {
@@ -84,13 +84,13 @@ $.widget("custom.visualization", {
 
         this.axis = this.svgContainer.append("g").call(xAxis);
         d3.selectAll(".tick line")
-            .attr("y2", function (d) {
+            .attr("y2", function(d) {
                 var milli = (d * 1000 % 1000).toFixed(0);
                 if (milli == 0) {
                     return 12;
                 } else if (milli % 100 == 0) {
                     return 10;
-                } else if (milli % 10 == 0) {
+                } else if  (milli % 10 == 0) {
                     return 5;
                 } else {
                     return 2;
@@ -145,12 +145,12 @@ $.widget("custom.visualization", {
             .range([0, song_length])
 
         // Init empty subobject for each class in properties
-        Object.keys(this.options.drum_props).forEach(function (key) {
+        Object.keys(this.options.drum_props).forEach(function(key) {
             output[key] = []
         })
 
         // Add every circles data to output
-        d3.selectAll("circle")._groups[0].forEach(function (circle) {
+        d3.selectAll("circle")._groups[0].forEach(function(circle) {
             var x_val = circle.cx.baseVal.value
             var x_time = x_to_t(x_val)
             output[circle.className.baseVal].push(x_time)
