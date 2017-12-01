@@ -3,7 +3,7 @@ $.widget("custom.visualization", {
         drum_data: {},
         widget_height: 100,
         song_length: 18,
-        song_path:"",
+        song_path : "",
         zoom_rate: 0.5,
         wave_color: "LightGrey",
         drum_props: {
@@ -134,11 +134,11 @@ $.widget("custom.visualization", {
         this.seek(0);
     },
 
-    get_all_drum_times: function () {
+    get_all_drum_times: function() {
         var output = {}
         var drum_props = this.options.drum_props
         var song_length = this.options.song_length
-        var zoom_rate = this.options.zoom_rate
+        var zoom_rate = this.options.zoom_rate;
         var width = song_length * zoom_rate * 1000
         var x_to_t = d3.scaleLinear()
             .domain([0, width])
