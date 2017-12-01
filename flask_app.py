@@ -11,7 +11,7 @@ UPLOAD_FOLDER = "./static/uploads"
 ALLOWED_EXTENSIONS = {'mp3', 'wav'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-annotator = DrumAnnotation("./trained_models/nov26.pkl")
+annotator = DrumAnnotation("./trained_models/nov30.pkl")
 
 
 def allowed_file(filename):
