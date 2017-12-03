@@ -28,6 +28,18 @@ $.widget("custom.export_controls", {
             }))
             .append($('<div>'))
             .append($('<input>', {
+                id: 'zip_file',
+                name: 'zip_file',
+                type: 'checkbox',
+                checked: false
+            }))
+            .append($('<label>', {
+                for: 'zip_file',
+                form: 'export_controls',
+                text:'Zip File'
+            }))
+            .append($('<div>'))
+            .append($('<input>', {
                 id: 'output_format',
                 name: 'output_format',
                 type: 'text',
@@ -45,7 +57,7 @@ $.widget("custom.export_controls", {
                 name: 'output_filename',
                 type: 'text',
                 required: true,
-                value: 'drum_events.txt'
+                value: 'drum_events_{type}.txt'
             }))
             .append($('<label>', {
                 for: 'output_filename',
@@ -63,20 +75,41 @@ $.widget("custom.export_controls", {
     },
 
     export_data: function() {
-        // This calls from the context of the submit button
-        var form = $("form").serializeArray();
+        var zip = $('#zip_file')[0].checked;
+        var separate = $('#separate_classes')[0].checked;
+        var filename = $('#output_filename').val();
+        var line_format = $('#output_format').val();
         var drum_times = $('body').visualization('get_all_drum_times');
-        form.push({name: 'drum_events',
-                   value: JSON.stringify(drum_times)});
 
-        $.post(action, form, function (result) {
-            // https://stackoverflow.com/a/26129406/4234532
-            var blob=new Blob([result]);
-            var link=document.createElement('a');
-            link.href=window.URL.createObjectURL(blob);
-            link.download=$('#output_filename')[0].value;
-            link.click();
+        // Post results to the server here
+        var drums = [{
+            name: 'drum_events',
+            value: JSON.stringify(drum_times)
+        }];
+        $.post(action, drums); 
+        // Client side processing here
+        /*
+        for event_class, times in drum_events.items():
+            for event_time in times:
+                f.write(output_format.format(time=event_time, type=event_class))
+                f.write('\n')
+        */
+
+        Object.keys(drum_times).forEach(function(key) {        
         
-        });
+        }
+        // Build file(s)
+        
+        // Trigger download
+        /*
+        // This calls from the context of the submit button
+        // https://stackoverflow.com/a/26129406/4234532
+        console.log(result) // pre-formatted list of events
+        var blob=new Blob([result]);
+        var link=document.createElement('a');
+        link.href=window.URL.createObjectURL(blob);
+        link.download=$('#output_filename')[0].value;
+        link.click();
+        */
     }});
 })(jQuery);
