@@ -64,23 +64,19 @@ def get_test():
 @app.route('/export', methods=['POST'])
 def export_data():
     '''
-    Receive the drum events and some meta data as a POST
-    Build the output around these
+    Receive the drum events as a POST
+    Right now we dont do anything with this, but in the future we can
+    automate the training with this data
     '''
-    output_format = request.form['output_format']
     drum_events = json.loads(request.form['drum_events'])
-    output_file = request.form['output_filename']
-    try:
-        separate_classes = request.form['separate_classes']
-    except KeyError:
-        separate_classes = False
-
+    output_file = 'output.txt'
+    output_format = "{time}, {type}"
+    # this writes all the events to 1 file to be handled client-side
+    # in the future can write to multiple server-side for auto retrain
     with open(UPLOAD_FOLDER + '/' + output_file, mode='w+') as f:
         for event_class, times in drum_events.items():
             for event_time in times:
                 f.write(output_format.format(time=event_time, type=event_class))
                 f.write('\n')
-    return send_file(UPLOAD_FOLDER + '/' + output_file,
-                    mimetype='"application/octet-stream"',
-                    attachment_filename=request.form['output_filename'],
-                    as_attachment=True)
+    return ('', 204)
+
