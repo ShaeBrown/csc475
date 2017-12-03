@@ -52,18 +52,20 @@ $.widget("custom.visualization", {
             .domain([0, this.options.song_length])
             .range([0, this.width]);
 
+        var menu = this._get_context_menu();
+
         var drum_circles = this._get_circle_data(this.options.drum_data);
         this.circles = this.svgContainer.append("g").selectAll("circle")
             .data(drum_circles)
             .enter()
-            .append("circle");
+            .append("circle")
+            .attr("cx", function (d) { return d.x;})
+            .attr("cy", function (d) { return d.y;})
+            .attr("r", function (d) { return d.radius;})
+            .attr("class", function (d) {return d.c;})
+            .style("fill", function (d) {return d.color;})
+            .on('contextmenu', d3.contextMenu(menu));
 
-        this.circles_attr = this.circles
-            .attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; })
-            .attr("r", function(d) { return d.radius; })
-            .attr("class", function(d) { return d.c; })
-            .style("fill", function(d) { return d.color; });
 
         var xAxis = d3.axisBottom(this.scale)
             .ticks(this.options.song_length * this.options.zoom_rate * 100)
@@ -98,7 +100,8 @@ $.widget("custom.visualization", {
         $("#visualization").width(this.width);
         var wavesurfer = WaveSurfer.create({
             container: '#visualization',
-            waveColor: this.options.wave_color
+            waveColor: this.options.wave_color,
+            interact: false
         });
         wavesurfer.load(this.options.song_path);
     },
@@ -133,24 +136,63 @@ $.widget("custom.visualization", {
 
     get_all_drum_times: function() {
         var output = {}
-        var drum_props = this.options.drum_props
-        var song_length = this.options.song_length
-        var zoom_rate = this.options.zoom_rate
-        var width = song_length * zoom_rate * 1000;        
+        var drum_props = this.options.drum_props;
+        var song_length = this.options.song_length;
+        var zoom_rate = this.options.zoom_rate;
+        var width = song_length * zoom_rate * 1000;
         var x_to_t = d3.scaleLinear()
-            .domain([0, width])       
-            .range([0, song_length])
+            .domain([0, width])
+            .range([0, song_length]);
 
         // Init empty subobject for each class in properties
         Object.keys(this.options.drum_props).forEach(function(key) {
             output[key] = []
-        })
+        });
+
         // Add every circles data to output
         d3.selectAll("circle")._groups[0].forEach(function(circle) {
-            var x_val = circle.cx.baseVal.value
-            var x_time = x_to_t(x_val)
-			output[circle.className.baseVal].push(x_time)
-        })
+            var x_val = circle.cx.baseVal.value;
+            var x_time = x_to_t(x_val);
+            output[circle.className.baseVal].push(x_time);
+        });
         return output
+    },
+
+    _get_context_menu: function() {
+        var self = this;
+        var menu = [];
+        menu[0] =
+        {
+            title: 'Delete',
+            action: function (elm, d, i) {
+                var remove = d;
+                d3.selectAll("circle").filter(function (d) {
+                    return d == remove;
+                }).remove();
+            }
+        };
+        for (let m = 0; m < Object.keys(this.options.drum_props).length; m++) {
+            menu[m + 1] =
+            {
+                title: function (d) {
+                    return Object.keys(self.options.drum_props)[m];
+                },
+                action: function (elm, d, i) {
+                    var remove = d;
+                    var type = Object.keys(self.options.drum_props)[m];
+                    var color = self.options.drum_props[type].color;
+                    var radius = self.options.drum_props[type].radius;
+                    var height = self.options.drum_props[type].height;
+                    self.circles.filter(function (d) {
+                        return d == remove;
+                    }).attr('class', type)
+                        .attr('r', radius)
+                        .attr('cy', height)
+                        .style('fill', color)
+                        .enter();
+                }
+            };
+        }
+        return menu;
     }
 });
