@@ -123,15 +123,18 @@ $.widget("custom.export_controls", {
                 link.click();
             });
         } else {
+            var zip_name = filename.format({type: "all"});
+            zip_name = zip_name.replace(".txt", ".zip");
+
             var zipper = new JSZip();
             Object.keys(files).forEach(function(key) {
                 zipper.file(key, files[key]);
             });
 
-            zipper.generateAsync({type:"base64"}).then(function (base64) {
-                window.location = "data:application/zip;base64," + base64;
+            zipper.generateAsync({type:"blob"}).then(function (blob) { 
+                saveAs(blob, zip_name);
             }, function (err) {
-                jQuery("#data_uri").text(err);
+                jQuery("#blob").text(err);
             });
         };
     }});
