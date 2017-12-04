@@ -92,17 +92,14 @@ $.widget("custom.export_controls", {
         var files = {};
         output = "";
         Object.keys(drum_times).forEach(function(key) { // each class
-            if (separate) {
-                output = "";
-            };
-
             drum_times[key].forEach(function (time) { // each time
                 output += line_format.format({type: key, time: time});
                 output += "\n";
             });
 
             if (separate) {
-                files[filename.format({type: key})] = new Blob([output]);                   
+                files[filename.format({type: key})] = new Blob([output]);
+                output = "";                 
             };
         });
 
