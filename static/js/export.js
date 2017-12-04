@@ -86,18 +86,14 @@ $.widget("custom.export_controls", {
             name: 'drum_events',
             value: JSON.stringify(drum_times)
         }];
-        $.post(action, drums); 
-        // Client side processing here
-        /*
-        for event_class, times in drum_events.items():
-            for event_time in times:
-                f.write(output_format.format(time=event_time, type=event_class))
-                f.write('\n')
-        */
+        $.post(action, drums);
 
+        // Client side processing here
         Object.keys(drum_times).forEach(function(key) {        
-        
-        }
+            drum_times[key].forEach(function (time) {
+                console.log(line_format.format({type: key, time: time}));
+            });
+        });
         // Build file(s)
         
         // Trigger download
@@ -113,3 +109,17 @@ $.widget("custom.export_controls", {
         */
     }});
 })(jQuery);
+
+// https://stackoverflow.com/a/25327583/4234532
+String.prototype.format = function (arguments) {
+    var this_string = '';
+    for (var char_pos = 0; char_pos < this.length; char_pos++) {
+        this_string = this_string + this[char_pos];
+    }
+
+    for (var key in arguments) {
+        var string_key = '{' + key + '}'
+        this_string = this_string.replace(new RegExp(string_key, 'g'), arguments[key]);
+    }
+    return this_string;
+};
