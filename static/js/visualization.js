@@ -205,27 +205,31 @@ $.widget("custom.visualization", {
     },
     
     _dragged: function (d) {
+        // TODO: allow class changes by dragging up/down
+        /*
         var snap = Math.round(d3.event.y/10);
         if (snap % 2 == 0) {
             snap++;
         }
         snap *= 10;
-
-        // Check edges TODO: no hardcoding
+        // Check edges
         if (snap > 100) {
             snap = 90;
         } else if (snap < 10) {
             snap = 10;
-        }
+        }*/
 
         d3.select(this)
-            .attr("cx", d.x = d3.event.x)
-            .attr("cy", d.y = snap);
+            .attr("cx", d.x = d3.event.x);
+            //.attr("cy", d.y = snap);
     },
     
     _dragended: function (d) {
-        console.log(d3.event.y)
         d3.select(this).classed("active", false);
+    },
+
+    update_circle_class: function (circle) {
+
     }
 
 });
