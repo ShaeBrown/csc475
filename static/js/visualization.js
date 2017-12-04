@@ -40,9 +40,10 @@ $.widget("custom.visualization", {
 
         d3.select("#visualization").append("svg")
             .attr("class", "fixed")
+            .attr("width", 3)            
             .append("line")
-            .attr("y1", 0)
-            .attr("y2", this.options.widget_height)
+            .attr("y1", this.options.widget_height)
+            .attr("y2", 0)
             .attr("x1", 0)
             .attr("x2", 0)
             .attr("stroke-width", 3)
@@ -64,8 +65,11 @@ $.widget("custom.visualization", {
             .attr("r", function (d) { return d.radius;})
             .attr("class", function (d) {return d.c;})
             .style("fill", function (d) {return d.color;})
-            .on('contextmenu', d3.contextMenu(menu));
-
+            .on('contextmenu', d3.contextMenu(menu))
+            .call(d3.drag()
+                .on("start", this._dragstarted)
+                .on("drag", this._dragged)
+                .on("end", this._dragended));
 
         var xAxis = d3.axisBottom(this.scale)
             .ticks(this.options.song_length * this.options.zoom_rate * 100)
@@ -194,5 +198,35 @@ $.widget("custom.visualization", {
             };
         }
         return menu;
+    },
+        
+    _dragstarted: function (d) {
+        d3.select(this).raise().classed("active", true);
+    },
+    
+    _dragged: function (d) {
+        var snap = Math.round(d3.event.y/10);
+        if (snap % 2 == 0) {
+            snap++;
+        }
+        snap *= 10;
+
+        // Check edges TODO: no hardcoding
+        if (snap > 100) {
+            snap = 90;
+        } else if (snap < 10) {
+            snap = 10;
+        }
+
+        d3.select(this)
+            .attr("cx", d.x = d3.event.x)
+            .attr("cy", d.y = snap);
+    },
+    
+    _dragended: function (d) {
+        console.log(d3.event.y)
+        d3.select(this).classed("active", false);
     }
+
 });
+
