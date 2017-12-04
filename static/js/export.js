@@ -89,28 +89,56 @@ $.widget("custom.export_controls", {
         $.post(action, drums);
 
         // Client side processing here
-        Object.keys(drum_times).forEach(function(key) {        
-            drum_times[key].forEach(function (time) {
-                console.log(line_format.format({type: key, time: time}));
+        var files = {};
+        output = "";
+        Object.keys(drum_times).forEach(function(key) { // each class
+            if (separate) {
+                output = "";
+            };
+
+            drum_times[key].forEach(function (time) { // each time
+                output += line_format.format({type: key, time: time});
+                output += "\n";
             });
+
+            if (separate) {
+                files[filename.format({type: key})] = new Blob([output]);                   
+            };
         });
-        // Build file(s)
-        
-        // Trigger download
-        /*
-        // This calls from the context of the submit button
-        // https://stackoverflow.com/a/26129406/4234532
-        console.log(result) // pre-formatted list of events
-        var blob=new Blob([result]);
-        var link=document.createElement('a');
-        link.href=window.URL.createObjectURL(blob);
-        link.download=$('#output_filename')[0].value;
-        link.click();
-        */
+
+        // Push the output as 1 file
+        if (!separate) {
+            files[filename.format({type: "all"})] = new Blob([output]);   
+        };
+
+        // Zip if needed
+        if (!zip) {
+            // Trigger download
+            Object.keys(files).forEach(function(key) {
+                var name = key;
+                var data = files[key];
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(data);
+                link.download = name;
+                link.click();
+            });
+        } else {
+            var zipper = new JSZip();
+            Object.keys(files).forEach(function(key) {
+                zipper.file(key, files[key]);
+            });
+
+            zipper.generateAsync({type:"base64"}).then(function (base64) {
+                window.location = "data:application/zip;base64," + base64;
+            }, function (err) {
+                jQuery("#data_uri").text(err);
+            });
+        };
     }});
 })(jQuery);
 
 // https://stackoverflow.com/a/25327583/4234532
+// Overrides string formatting to match that of python
 String.prototype.format = function (arguments) {
     var this_string = '';
     for (var char_pos = 0; char_pos < this.length; char_pos++) {
