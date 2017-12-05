@@ -36,7 +36,13 @@ $.widget("custom.visualization", {
             .append('svg')
             .attr('class', 'visualization')
             .attr('width', this.width)
-            .attr('height', this.options.widget_height);
+            .attr('height', this.options.widget_height)
+            .on("dblclick", function() {
+                var loc = d3.mouse(this);
+                var x = loc[0];
+                var y = loc[1];
+                console.log("New circle at", x, y);
+            });
 
         d3.select("#visualization").append("svg")
             .attr("class", "fixed")
@@ -54,7 +60,7 @@ $.widget("custom.visualization", {
             .range([0, this.width]);
 
         var menu = this._get_context_menu();
-
+        
         var drum_circles = this._get_circle_data(this.options.drum_data);
         this.circles = this.svgContainer.append("g").selectAll("circle")
             .data(drum_circles)
