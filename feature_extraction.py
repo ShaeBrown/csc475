@@ -53,7 +53,7 @@ class FeatureExtraction:
         for onset in self.audio_clips:
             max_abs = np.max(np.abs(onset))
             r = librosa.feature.rmse(y=onset, frame_length=len(onset))
-            crest.append(max_abs/r[0])
+            crest.append(max_abs/r[0][0])
         self.features.append(crest)
         return self
 
@@ -98,6 +98,22 @@ class FeatureExtraction:
             c = librosa.feature.mfcc(y=onset, sr=self.sr, n_mfcc=1)
             mfcc.append(c[0][0])
         self.features.append(mfcc)
+        return self
+
+    def with_spectral_bandwith(self):
+        band = []
+        for onset in self.audio_clips:
+            b = librosa.feature.spectral_bandwidth(onset, self.sr)
+            band.append(b[0][0])
+        self.features.append(band)
+        return self
+
+    def with_row_operation(self, row1, row2, op):
+        result = []
+        for f1, f2 in zip(self.features[row1], self.features[row2]):
+            r = op(f1, f2)
+            result.append(r)
+        self.features.append(result)
         return self
 
     def get_feature_matrix(self):

@@ -2,16 +2,16 @@ import os.path
 import re
 import librosa
 import numpy as np
-from feature_extraction import FeatureExtraction
+from drum_annotation import DrumAnnotation
 from onset_detection import OnsetDetect
-from sklearn.neural_network import MLPClassifier
-import sklearn.ensemble
-import sklearn
 from sklearn.model_selection import KFold
+from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn import metrics
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.externals import joblib
 from tabulate import tabulate
+import matplotlib.pyplot as plt
 
 classes = ["Bass drum", "Hi-hat closed", "Hi-hat open", "Snare drum"]
 
@@ -55,21 +55,7 @@ def get_data():
                 print("Training on file {}".format(file))
                 song, sr = librosa.core.load(os.path.join(train_folder, folder, file))
                 onset = OnsetDetect(song, sr)
-                nyq = sr / 2
-                f = FeatureExtraction(onset.get_onset_clips(0.02), sr) \
-                    .with_spectral_centroid() \
-                    .with_zero_crossing_rate() \
-                    .with_rms() \
-                    .with_rms_of_filter(np.divide([49, 50], nyq), np.divide([0.01, 2000], nyq), 0.01, 62)\
-                    .with_rms_of_filter(np.divide([200, 201], nyq), np.divide([1, 1300], nyq), 0.01, 20)\
-                    .with_rms_of_filter(np.divide([5100, 16300], nyq), np.divide([65, 22000], nyq), 0.05, 60)\
-                    .with_spectral_kurtosis() \
-                    .with_spectral_skewness() \
-                    .with_spectral_rolloff() \
-                    .with_spectral_flatness() \
-                    .with_mfcc() \
-                    .get_feature_matrix()
-
+                f = DrumAnnotation.get_features(onset.get_onset_clips(0.02), sr)
                 t = []
                 for time in onset.get_times():
                     truth = get_truth(os.path.join(train_folder, folder), time)
@@ -80,7 +66,7 @@ def get_data():
                 y.extend(t)
 
     y = MultiLabelBinarizer(classes=classes).fit_transform(y)
-    print("Onset detection captured {0} out of {1} training data events".format(total_matches, \
+    print("Onset detection captured {0} out of {1} training data events".format(total_matches,
                                                                                 get_total_events(train_folder)))
     return np.array(X), y
 
@@ -122,9 +108,36 @@ def test_model(clf, X, y, folds=10):
     return truth, pred
 
 
+def plot_feature_importance(X, y):
+    forest = ExtraTreesClassifier(n_estimators=250,
+                              random_state=0)
+    forest.fit(X, y)
+    importances = forest.feature_importances_
+    std = np.std([tree.feature_importances_ for tree in forest.estimators_],
+         axis=0)
+    indices = np.argsort(importances)[::-1]
+    features = np.array(['s_c', '0_rate', 'rms', 'RMSb1', 'RMSb2', 'RMSb3', 'c_f',
+                         's_b', 's_k', 's_s', 's_r', 's_f', 'mfcc', 'RMSb1Rel', 'RMSb2Rel', 'RMSb3Rel', 'RMSbRelComb12',
+                         'RMSbRelComb13', 'RMSbRelComb23'])
+    # Print the feature ranking
+    print("Feature ranking:")
+    for f in range(X.shape[1]):
+        print("%d. %s (%f)" % (f + 1, features[indices[f]], importances[indices[f]]))
+
+    # Plot the feature importances of the forest
+    plt.figure()
+    plt.title("Feature importances")
+    plt.bar(range(X.shape[1]), importances[indices],
+           color="r", yerr=std[indices], align="center")
+    plt.xticks(range(X.shape[1]), features[indices])
+    plt.xlim([-1, X.shape[1]])
+    plt.show()
+
+
 def train():
     X, y = get_data()
-    clf = sklearn.tree.DecisionTreeClassifier()
+    plot_feature_importance(X, y)
+    clf = MLPClassifier()
     truth, pred = test_model(clf, X, y)
     print_report(truth, pred)
     print("Would you like to export this trained model? [y/n]")
