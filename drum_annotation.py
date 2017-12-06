@@ -13,7 +13,7 @@ class DrumAnnotation:
 
     def get_drum_prediction_times(self, song, sr):
         onset = OnsetDetect(song, sr)
-        X = self.get_features(onset.get_onset_clips(0.02), sr)
+        X = self.get_features(onset.get_onset_clips(0.05), sr)
         y = self.clf.predict(X)
         return self.__get_class_times(onset.get_times(), y)
 
