@@ -1,32 +1,35 @@
 import os.path
 import re
+import pickle
 import librosa
 import numpy as np
-from feature_extraction import FeatureExtraction
+from drum_annotation import DrumAnnotation
 from onset_detection import OnsetDetect
-from sklearn.neural_network import MLPClassifier
-import sklearn.ensemble
-import sklearn
-from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_predict
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn import metrics
 from sklearn.externals import joblib
 from tabulate import tabulate
+import matplotlib.pyplot as plt
 
 classes = ["Bass drum", "Hi-hat closed", "Hi-hat open", "Snare drum"]
+X_file = "./static/test_data/X.p"
+y_file = "./static/test_data/y.p"
 
 
 def get_total_events(train_folder):
     total = 0
     for folder in os.listdir(train_folder):
-        times = set()
-        for file in os.listdir(os.path.join(train_folder, folder)):
-            if file.endswith(".txt") and file.startswith(tuple(classes)):
-                with open(os.path.join(train_folder, folder, file)) as f:
-                    for line in f:
-                        for t in re.findall(r"\d+\.\d+", line):
-                            times.add(t)
-        total += len(times)
+        if os.path.isdir(os.path.join(train_folder, folder)):
+            times = set()
+            for file in os.listdir(os.path.join(train_folder, folder)):
+                if file.endswith(".txt") and file.startswith(tuple(classes)):
+                    with open(os.path.join(train_folder, folder, file)) as f:
+                        for line in f:
+                            for t in re.findall(r"\d+\.\d+", line):
+                                times.add(t)
+            total += len(times)
     return total
 
 
@@ -44,45 +47,49 @@ def get_truth(folder, time):
     return truth
 
 
-def get_data():
+def load_data():
     train_folder = "./static/test_data"
     X = []
     y = []
     total_matches = 0
     for folder in os.listdir(train_folder):
-        for file in os.listdir(os.path.join(train_folder, folder)):
-            if file.endswith(".wav") or file.endswith(".mp3"):
-                print("Training on file {}".format(file))
-                song, sr = librosa.core.load(os.path.join(train_folder, folder, file))
-                onset = OnsetDetect(song, sr)
-                nyq = sr / 2
-                f = FeatureExtraction(onset.get_onset_clips(0.02), sr) \
-                    .with_spectral_centroid() \
-                    .with_zero_crossing_rate() \
-                    .with_rms() \
-                    .with_rms_of_filter(np.divide([49, 50], nyq), np.divide([0.01, 2000], nyq), 0.01, 62)\
-                    .with_rms_of_filter(np.divide([200, 201], nyq), np.divide([1, 1300], nyq), 0.01, 20)\
-                    .with_rms_of_filter(np.divide([5100, 16300], nyq), np.divide([65, 22000], nyq), 0.05, 60)\
-                    .with_spectral_kurtosis() \
-                    .with_spectral_skewness() \
-                    .with_spectral_rolloff() \
-                    .with_spectral_flatness() \
-                    .with_mfcc() \
-                    .get_feature_matrix()
-
-                t = []
-                for time in onset.get_times():
-                    truth = get_truth(os.path.join(train_folder, folder), time)
-                    t.append(truth)
-                    if len(truth) > 0:
-                        total_matches += 1
-                X.extend(f)
-                y.extend(t)
-
+        if os.path.isdir(os.path.join(train_folder, folder)):
+            for file in os.listdir(os.path.join(train_folder, folder)):
+                if file.endswith(".wav") or file.endswith(".mp3"):
+                    print("Training on file {}".format(file))
+                    song, sr = librosa.core.load(os.path.join(train_folder, folder, file))
+                    onset = OnsetDetect(song, sr)
+                    f = DrumAnnotation.get_features(onset.get_onset_clips(0.05), sr)
+                    t = []
+                    for time in onset.get_times():
+                        truth = get_truth(os.path.join(train_folder, folder), time)
+                        t.append(truth)
+                        if len(truth) > 0:
+                            total_matches += 1
+                    X.extend(f)
+                    y.extend(t)
     y = MultiLabelBinarizer(classes=classes).fit_transform(y)
-    print("Onset detection captured {0} out of {1} training data events".format(total_matches, \
+    print("Onset detection captured {0} out of {1} training data events".format(total_matches,
                                                                                 get_total_events(train_folder)))
+    pickle.dump(np.array(X), open(X_file, "wb"))
+    pickle.dump(y, open(y_file, "wb"))
+    print("Exported data as pickle file")
     return np.array(X), y
+
+
+def get_data():
+    if os.path.exists(X_file) and os.path.exists(y_file):
+        print("Would you like to re-preform onset detection and feature extraction? [y/n]")
+        ans = input()
+        if ans == "y":
+            return load_data()
+        else:
+            X = pickle.load(open(X_file, "rb"))
+            y = pickle.load(open(y_file, "rb"))
+            print("Loaded data from pickle files")
+            return np.array(X), np.array(y)
+    else:
+        return load_data()
 
 
 def print_report(truth, pred, folds=10):
@@ -108,25 +115,35 @@ def print_report(truth, pred, folds=10):
     print(tabulate(class_results, headers=["Class", "Accuracy", "Precision", "Recall", "Samples"]))
 
 
-def test_model(clf, X, y, folds=10):
-    skf = KFold(n_splits=folds)
-    truth = []
-    pred = []
-    for train_index, test_index in skf.split(X):
-        X_train, X_test = X[train_index], X[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        clf.fit(X_train, y_train)
-        p = clf.predict(X_test)
-        truth.extend(y_test)
-        pred.extend(p)
-    return truth, pred
+def plot_feature_importance(clf, X, y):
+    # Only works for classifiers with feature importance values
+    clf.fit(X, y)
+    importances = clf.feature_importances_
+    indices = np.argsort(importances)[::-1]
+    features = np.array(['s_c', '0_rate', 'rms', 'RMSb1', 'RMSb2', 'RMSb3', 'c_f',
+                         's_b', 's_k', 's_s', 's_r', 's_f', 'mfcc', 'RMSb1Rel', 'RMSb2Rel', 'RMSb3Rel', 'RMSbRel12',
+                         'RMSbRel13', 'RMSbRel23'])
+    # Print the feature ranking
+    print("Feature ranking:")
+    for f in range(X.shape[1]):
+        print("%d. %s (%f)" % (f + 1, features[indices[f]], importances[indices[f]]))
+
+    # Plot the feature importances
+    plt.figure()
+    plt.title("Feature importances")
+    plt.bar(range(X.shape[1]), importances[indices],
+           color="r", align="center")
+    plt.xticks(range(X.shape[1]), features[indices])
+    plt.xlim([-1, X.shape[1]])
+    plt.show()
 
 
 def train():
     X, y = get_data()
-    clf = sklearn.tree.DecisionTreeClassifier()
-    truth, pred = test_model(clf, X, y)
-    print_report(truth, pred)
+    clf = DecisionTreeClassifier()
+    #plot_feature_importance(clf, X, y)
+    pred = cross_val_predict(clf, X, y, cv=10)
+    print_report(y, pred, folds=10)
     print("Would you like to export this trained model? [y/n]")
     export = input().lower().strip() == "y"
     if export:
@@ -135,7 +152,6 @@ def train():
         clf.fit(X, y)
         joblib.dump(clf, './trained_models/' + file + '.pkl')
         print("Exported model " + file + " in trained models")
-
 
 if __name__ == '__main__':
     train()
