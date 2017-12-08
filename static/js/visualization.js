@@ -116,29 +116,32 @@ $.widget("custom.visualization", {
         var mouse_x = mouse_xy[0];
         var mouse_y = mouse_xy[1];
         
-        var snap = Math.round(mouse_y/10);
-        if (snap % 2 == 0) {
-            snap++;
-        }
-        snap *= 10;
-        // Check edges
-        if (snap > 100) {
-            snap = 90;
-        } else if (snap < 10) {
-            snap = 10;
-        }
+        // Get colour and class of click
+        var closest_class_distance = Infinity;
+        var new_class = "";
+        var new_color = "";
+        var new_radius = 0;
+        var new_height = 0;
+        for (var prop in this.options.drum_props) {
+            console.log(prop);
+            var class_distance = Math.abs(this.options.drum_props[prop].height - mouse_y)
 
+            if (class_distance < closest_class_distance) {
+                new_class = prop;
+                new_height = this.options.drum_props[prop].height;                
+                new_color = this.options.drum_props[prop].color;
+                new_radius = this.options.drum_props[prop].radius;
+
+                closest_class_distance = class_distance;
+            }
+        };
         var d = [{
             x: mouse_x,
-            y: snap,
-            radius: 10,
-            c: "Bass drum",
-            color: "red"
-        }];
-        console.log("New circle", d);
-        console.log(this.svgContainer);
-        console.log(d3.mouse(this.svgContainer.node()));
-        
+            y: new_height,
+            radius: new_radius,
+            c: new_class,
+            color: new_color
+        }];        
 
         this.svgContainer.select("g")
             .append("circle")
