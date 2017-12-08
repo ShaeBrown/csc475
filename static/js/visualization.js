@@ -123,7 +123,6 @@ $.widget("custom.visualization", {
         var new_radius = 0;
         var new_height = 0;
         for (var prop in this.options.drum_props) {
-            console.log(prop);
             var class_distance = Math.abs(this.options.drum_props[prop].height - mouse_y)
 
             if (class_distance < closest_class_distance) {
@@ -135,6 +134,7 @@ $.widget("custom.visualization", {
                 closest_class_distance = class_distance;
             }
         };
+
         var d = [{
             x: mouse_x,
             y: new_height,
@@ -215,10 +215,8 @@ $.widget("custom.visualization", {
         var menu = [];
         menu[0] =
         {
-            // TODO: remove from this.drum_circles
             title: 'Delete',
             action: function (elm, d, i) {
-                //this.drum_circles.remove(d)
                 var remove = d;
                 d3.selectAll("circle").filter(function (d) {
                     return d == remove;
