@@ -37,12 +37,7 @@ $.widget("custom.visualization", {
             .attr('class', 'visualization')
             .attr('width', this.width)
             .attr('height', this.options.widget_height)
-            .on("dblclick", function() {
-                var loc = d3.mouse(this);
-                var x = loc[0];
-                var y = loc[1];
-                console.log("New circle at", x, y);
-            });
+            .on("dblclick", $.proxy(this._add_new_circle, this));
 
         d3.select("#visualization").append("svg")
             .attr("class", "fixed")
@@ -59,11 +54,11 @@ $.widget("custom.visualization", {
             .domain([0, this.options.song_length])
             .range([0, this.width]);
 
-        var menu = this._get_context_menu();
+        this.menu = this._get_context_menu();
         
-        var drum_circles = this._get_circle_data(this.options.drum_data);
+        this.drum_circles = this._get_circle_data(this.options.drum_data);
         this.circles = this.svgContainer.append("g").selectAll("circle")
-            .data(drum_circles)
+            .data(this.drum_circles)
             .enter()
             .append("circle")
             .attr("cx", function (d) { return d.x;})
@@ -71,7 +66,7 @@ $.widget("custom.visualization", {
             .attr("r", function (d) { return d.radius;})
             .attr("class", function (d) {return d.c;})
             .style("fill", function (d) {return d.color;})
-            .on('contextmenu', d3.contextMenu(menu))
+            .on('contextmenu', d3.contextMenu(this.menu))
             .call(d3.drag()
                 .on("start", this._dragstarted)
                 .on("drag", this._dragged)
@@ -114,6 +109,50 @@ $.widget("custom.visualization", {
             interact: false
         });
         wavesurfer.load(this.options.song_path);
+    },
+
+    _add_new_circle: function () {
+        var mouse_xy = d3.mouse(this.svgContainer.node());
+        var mouse_x = mouse_xy[0];
+        var mouse_y = mouse_xy[1];
+        
+        var snap = Math.round(mouse_y/10);
+        if (snap % 2 == 0) {
+            snap++;
+        }
+        snap *= 10;
+        // Check edges
+        if (snap > 100) {
+            snap = 90;
+        } else if (snap < 10) {
+            snap = 10;
+        }
+
+        var d = [{
+            x: mouse_x,
+            y: snap,
+            radius: 10,
+            c: "Bass drum",
+            color: "red"
+        }];
+        console.log("New circle", d);
+        console.log(this.svgContainer);
+        console.log(d3.mouse(this.svgContainer.node()));
+        
+
+        this.svgContainer.select("g")
+            .append("circle")
+            .data(d)
+            .attr("cx", function (d) { return d.x;})
+            .attr("cy", function (d) { return d.y;})
+            .attr("r", function (d) { return d.radius;})
+            .attr("class", function (d) {return d.c;})
+            .style("fill", function (d) {return d.color;})
+            .on('contextmenu', d3.contextMenu(this.menu))
+            .call(d3.drag()
+                .on("start", this._dragstarted)
+                .on("drag", this._dragged)
+                .on("end", this._dragended));
     },
 
     _get_circle_data: function(drum_events) {
@@ -173,8 +212,10 @@ $.widget("custom.visualization", {
         var menu = [];
         menu[0] =
         {
+            // TODO: remove from this.drum_circles
             title: 'Delete',
             action: function (elm, d, i) {
+                //this.drum_circles.remove(d)
                 var remove = d;
                 d3.selectAll("circle").filter(function (d) {
                     return d == remove;
