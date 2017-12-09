@@ -71,7 +71,7 @@ $.widget("custom.visualization", {
                 .on("start", this._dragstarted)
                 .on("drag", this._dragged)
                 .on("end", this._dragended));
-
+        console.log(this.circles);
         var xAxis = d3.axisBottom(this.scale)
             .ticks(this.options.song_length * this.options.zoom_rate * 100)
             .tickSize(10)
@@ -142,7 +142,7 @@ $.widget("custom.visualization", {
             c: new_class,
             color: new_color
         }];        
-
+        console.log(this.menu);
         this.svgContainer.select("g")
             .append("circle")
             .data(d)
