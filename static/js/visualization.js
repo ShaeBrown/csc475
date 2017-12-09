@@ -36,13 +36,15 @@ $.widget("custom.visualization", {
             .append('svg')
             .attr('class', 'visualization')
             .attr('width', this.width)
-            .attr('height', this.options.widget_height);
+            .attr('height', this.options.widget_height)
+            .on("dblclick", $.proxy(this._add_new_circle, this));
 
         d3.select("#visualization").append("svg")
             .attr("class", "fixed")
+            .attr("width", 3)            
             .append("line")
-            .attr("y1", 0)
-            .attr("y2", this.options.widget_height)
+            .attr("y1", this.options.widget_height)
+            .attr("y2", 0)
             .attr("x1", 0)
             .attr("x2", 0)
             .attr("stroke-width", 3)
@@ -52,11 +54,11 @@ $.widget("custom.visualization", {
             .domain([0, this.options.song_length])
             .range([0, this.width]);
 
-        var menu = this._get_context_menu();
-
-        var drum_circles = this._get_circle_data(this.options.drum_data);
+        this.menu = this._get_context_menu();
+        
+        this.drum_circles = this._get_circle_data(this.options.drum_data);
         this.circles = this.svgContainer.append("g").selectAll("circle")
-            .data(drum_circles)
+            .data(this.drum_circles)
             .enter()
             .append("circle")
             .attr("cx", function (d) { return d.x;})
@@ -64,9 +66,12 @@ $.widget("custom.visualization", {
             .attr("r", function (d) { return d.radius;})
             .attr("class", function (d) {return d.c;})
             .style("fill", function (d) {return d.color;})
-            .on('contextmenu', d3.contextMenu(menu));
-
-
+            .on('contextmenu', d3.contextMenu(this.menu))
+            .call(d3.drag()
+                .on("start", this._dragstarted)
+                .on("drag", this._dragged)
+                .on("end", this._dragended));
+        
         var xAxis = d3.axisBottom(this.scale)
             .ticks(this.options.song_length * this.options.zoom_rate * 100)
             .tickSize(10)
@@ -104,6 +109,54 @@ $.widget("custom.visualization", {
             interact: false
         });
         wavesurfer.load(this.options.song_path);
+    },
+
+    _add_new_circle: function () {
+        var mouse_xy = d3.mouse(this.svgContainer.node());
+        var mouse_x = mouse_xy[0];
+        var mouse_y = mouse_xy[1];
+        
+        // Get colour and class of click
+        var closest_class_distance = Infinity;
+        var new_class = "";
+        var new_color = "";
+        var new_radius = 0;
+        var new_height = 0;
+        for (var prop in this.options.drum_props) {
+            var class_distance = Math.abs(this.options.drum_props[prop].height - mouse_y)
+
+            if (class_distance < closest_class_distance) {
+                new_class = prop;
+                new_height = this.options.drum_props[prop].height;                
+                new_color = this.options.drum_props[prop].color;
+                new_radius = this.options.drum_props[prop].radius;
+
+                closest_class_distance = class_distance;
+            }
+        };
+
+        var d = [{
+            x: mouse_x,
+            y: new_height,
+            radius: new_radius,
+            c: new_class,
+            color: new_color
+        }];        
+
+        this.svgContainer.select("g")
+            .append("circle")
+            .data(d)
+            .attr("cx", function (d) { return d.x;})
+            .attr("cy", function (d) { return d.y;})
+            .attr("r", function (d) { return d.radius;})
+            .attr("class", function (d) {return d.c;})
+            .style("fill", function (d) {return d.color;})
+            .on('contextmenu', d3.contextMenu(this.menu))
+            .call(d3.drag()
+                .on("start", this._dragstarted)
+                .on("drag", this._dragged)
+                .on("end", this._dragended));
+        this.circles = this.svgContainer.selectAll("circle");
     },
 
     _get_circle_data: function(drum_events) {
@@ -183,6 +236,7 @@ $.widget("custom.visualization", {
                     var color = self.options.drum_props[type].color;
                     var radius = self.options.drum_props[type].radius;
                     var height = self.options.drum_props[type].height;
+
                     self.circles.filter(function (d) {
                         return d == remove;
                     }).attr('class', type)
@@ -194,5 +248,18 @@ $.widget("custom.visualization", {
             };
         }
         return menu;
-    }
+    },
+        
+    _dragstarted: function (d) {
+        d3.select(this).raise().classed("active", true);
+    },
+    
+    _dragged: function (d) {
+        d3.select(this).attr("cx", d.x = d3.event.x);
+    },
+    
+    _dragended: function (d) {
+        d3.select(this).classed("active", false);
+    },
 });
+
