@@ -27,7 +27,44 @@ Once you upload a file it will redirect to the annotation editing page. This pag
 
 ## Retraining the model
 
-Right now there is no way to do this using the front end. You may retrain the model by running the *train.py* file. This file retrains a model using the data in *static/test_data*. See that folders README for a description of the training data format.
+Right now there is no way to do this using the front end. You may retrain the model by running the *train.py* file. This file retrains a model using the data in *static/test_data*.
+
+The format of the training data is as follows:
+
+File structure:
+
+```txt
+static/test_data
+├── song1_name
+│   ├── Bass drum.txt
+│   ├── song1.wav
+│   ├── Chinese ride cymbal.txt
+│   ├── Hi-hat closed.txt
+│   ├── Hi-hat open.txt
+│   ├── Low tom.txt
+│   └── Snare drum.txt
+└── song2_name
+    ├── Bass drum.txt
+    ├── song2.mp3
+    ├── Hi-hat closed.txt
+    ├── Hi-hat open.txt
+    └── Snare drum.txt
+```
+
+Annotation file structure example:
+
+_Note: Class names in this file are optional. You may use a list of times separated by newlines as well._
+
+```txt
+0.773469387   bd
+2.537142857   bd
+4.323129251   bd
+6.106122448   bd
+7.866303854   bd
+9.659297052   bd
+11.426757369   bd
+13.219863945   bd
+```
 
 Once *train.py* is run, you can change the model file in the header of *flask_app.py*
 
