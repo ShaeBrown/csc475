@@ -71,7 +71,7 @@ $.widget("custom.visualization", {
                 .on("start", this._dragstarted)
                 .on("drag", this._dragged)
                 .on("end", this._dragended));
-        console.log(this.circles);
+        
         var xAxis = d3.axisBottom(this.scale)
             .ticks(this.options.song_length * this.options.zoom_rate * 100)
             .tickSize(10)
@@ -142,7 +142,7 @@ $.widget("custom.visualization", {
             c: new_class,
             color: new_color
         }];        
-        console.log(this.menu);
+
         this.svgContainer.select("g")
             .append("circle")
             .data(d)
@@ -156,6 +156,7 @@ $.widget("custom.visualization", {
                 .on("start", this._dragstarted)
                 .on("drag", this._dragged)
                 .on("end", this._dragended));
+        this.circles = this.svgContainer.selectAll("circle");
     },
 
     _get_circle_data: function(drum_events) {
@@ -235,6 +236,9 @@ $.widget("custom.visualization", {
                     var color = self.options.drum_props[type].color;
                     var radius = self.options.drum_props[type].radius;
                     var height = self.options.drum_props[type].height;
+                    console.log(d, self.circles.filter(function (d) {
+                        return d == remove;
+                    }));
                     self.circles.filter(function (d) {
                         return d == remove;
                     }).attr('class', type)
@@ -253,32 +257,11 @@ $.widget("custom.visualization", {
     },
     
     _dragged: function (d) {
-        // TODO: allow class changes by dragging up/down
-        /*
-        var snap = Math.round(d3.event.y/10);
-        if (snap % 2 == 0) {
-            snap++;
-        }
-        snap *= 10;
-        // Check edges
-        if (snap > 100) {
-            snap = 90;
-        } else if (snap < 10) {
-            snap = 10;
-        }*/
-
-        d3.select(this)
-            .attr("cx", d.x = d3.event.x);
-            //.attr("cy", d.y = snap);
+        d3.select(this).attr("cx", d.x = d3.event.x);
     },
     
     _dragended: function (d) {
         d3.select(this).classed("active", false);
     },
-
-    update_circle_class: function (circle) {
-
-    }
-
 });
 
