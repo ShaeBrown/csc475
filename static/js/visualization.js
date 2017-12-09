@@ -236,9 +236,7 @@ $.widget("custom.visualization", {
                     var color = self.options.drum_props[type].color;
                     var radius = self.options.drum_props[type].radius;
                     var height = self.options.drum_props[type].height;
-                    console.log(d, self.circles.filter(function (d) {
-                        return d == remove;
-                    }));
+
                     self.circles.filter(function (d) {
                         return d == remove;
                     }).attr('class', type)
