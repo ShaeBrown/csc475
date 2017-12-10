@@ -27,7 +27,3 @@ html, body {
     position: absolute;
     z-index: 2;
 }
-
-#labels {
-    margin-left: 50px;
-}

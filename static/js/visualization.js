@@ -102,32 +102,6 @@ $.widget("custom.visualization", {
                 }
             });
 
-        var labels = d3.select("#labels").append('svg')
-            .attr('class', 'lables')
-            .attr('width', 150)
-            .attr('height', 100);
-
-        var label_data = this._get_label_data();
-        labels.append("g").selectAll("circle")
-            .data(label_data)
-            .enter()
-            .append("circle")
-            .attr("cx", function (d) { return d.x;})
-            .attr("cy", function (d) { return d.y;})
-            .attr("r", function (d) { return d.radius;})
-            .style("fill", function (d) {return d.color;});
-
-        labels.selectAll("text")
-            .data(label_data)
-            .enter()
-            .append("text")
-            .attr("x", function(d) { return d.x + 50; })
-            .attr("y", function(d) { return d.y; })
-            .text( function (d) { return d.text; })
-            .attr("font-family", "sans-serif")
-            .attr("font-size", "12px")
-            .attr("fill", "black");
-
         $("#visualization").width(this.width);
         var wavesurfer = WaveSurfer.create({
             container: '#visualization',
@@ -135,22 +109,6 @@ $.widget("custom.visualization", {
             interact: false
         });
         wavesurfer.load(this.options.song_path);
-    },
-
-    _get_label_data: function() {
-        var label_data = [];
-        var self = this;
-        Object.keys(this.options.drum_props).forEach(function(drum_type) {
-            var prop = self.options.drum_props[drum_type];
-            label_data.push({
-                text: drum_type,
-                x: 10,
-                y: prop.height,
-                color: prop.color,
-                radius: prop.radius
-            })
-        });
-        return label_data;
     },
 
     _add_new_circle: function () {
