@@ -1,0 +1,21 @@
+LICENSE
+
+License: Creative Commons Attribution-NonCommercial 1.0
+Please read: http://creativecommons.org/licenses/by-nc/1.0/
+
+
+CREDITS
+
+"The ones we love" by Another Dreamer (Chad Manney) and Eva
+URL: http://www.anotherdreamer.net/
+
+Remix is done by Michel Desnoues from Telecom ParisTech
+
+
+DESCRIPTION
+
+This snip is extracted from the corresponding full-length mix available in dev2_full_mix.zip
+
+Snip beginning : 69 seconds (3042900 samples)
+Snip end       : 94 seconds (4145400 samples)
+Snip length    : 25 seconds (1102501 samples)
