@@ -2,7 +2,9 @@
 
 Shae Brown & Jarred Hawkins
 
-See our [written report](TODO.pdf) for more technical info.
+See our [written report](report_final.pdf) for more technical info.
+
+A live demo based off of the deploy branch is available [here](https://drum-annotation.herokuapp.com/).
 
 ## Installation
 
