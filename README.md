@@ -2,7 +2,9 @@
 
 Shae Brown & Jarred Hawkins
 
-See our [written report](TODO.pdf) for more technical info.
+See our [written report](report_final.pdf) for more technical info.
+
+A live demo based off of the deploy branch is available [here](https://drum-annotation.herokuapp.com/).
 
 ## Installation
 
@@ -73,3 +75,14 @@ Once *train.py* is run, you can change the model file in the header of *flask_ap
 Using the export feature on the main window, you can output the file in the desired formats. Using python style string formatting you may also change the format of these output lines and file names.
 
 Once the annotated data is exported, you may also move it into the the training folder and retrain the model using your annotated data.
+
+## Included data sets
+
+Our initial model was trained with several data sets. These data sets are as follows:
+
+- [MDB DRUMS – AN ANNOTATED SUBSET OF MEDLEYDB FOR AUTOMATIC DRUM TRANSCRIPTION](https://github.com/CarlSouthall/MDBDrums)
+- [DREANSS: DRum Event ANnotations for Source Separation](https://www.upf.edu/web/mtg/dreanss)
+
+Due to licensing issues, we can not redistribute the DREANSS data set along with this repository. We hope that these links will provide a starting point to anyone wishing to build their own models.
+
+The MDB DRUMS data set is included in the *static/test_data/* folder. An accompanying license file is also present in *licenses/*
