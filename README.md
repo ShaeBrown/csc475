@@ -83,4 +83,6 @@ Our initial model was trained with several data sets. These data sets are as fol
 - [MDB DRUMS – AN ANNOTATED SUBSET OF MEDLEYDB FOR AUTOMATIC DRUM TRANSCRIPTION](https://github.com/CarlSouthall/MDBDrums)
 - [DREANSS: DRum Event ANnotations for Source Separation](https://www.upf.edu/web/mtg/dreanss)
 
-Due to licensing issues, we can not redistribute the data set along with this repository. We hope that these links will provide a starting point to anyone wishing to build their own models.
+Due to licensing issues, we can not redistribute the DREANSS data set along with this repository. We hope that these links will provide a starting point to anyone wishing to build their own models.
+
+The MDB DRUMS data set is included in the *static/test_data/* folder. An accompanying license file is also present in *licenses/*
