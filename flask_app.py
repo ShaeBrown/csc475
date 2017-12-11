@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from drum_annotation import DrumAnnotation
 
 UPLOAD_FOLDER = "./static/uploads"
-ALLOWED_EXTENSIONS = {'mp3', 'wav'}
+ALLOWED_EXTENSIONS = {'wav'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 annotator = DrumAnnotation("./trained_models/final.pkl")
