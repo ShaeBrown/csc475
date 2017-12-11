@@ -11,7 +11,6 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn import metrics
 from sklearn.externals import joblib
 from tabulate import tabulate
-import matplotlib.pyplot as plt
 
 classes = ["Bass drum", "Hi-hat closed", "Hi-hat open", "Snare drum"]
 X_file = "./static/test_data/X.p"
@@ -113,29 +112,6 @@ def print_report(truth, pred, folds=10):
         results.append(np.sum(c_truth))
         class_results.append(results)
     print(tabulate(class_results, headers=["Class", "Accuracy", "Precision", "Recall", "Samples"]))
-
-
-def plot_feature_importance(clf, X, y):
-    # Only works for classifiers with feature importance values
-    clf.fit(X, y)
-    importances = clf.feature_importances_
-    indices = np.argsort(importances)[::-1]
-    features = np.array(['s_c', '0_rate', 'rms', 'RMSb1', 'RMSb2', 'RMSb3', 'c_f',
-                         's_b', 's_k', 's_s', 's_r', 's_f', 'mfcc', 'RMSb1Rel', 'RMSb2Rel', 'RMSb3Rel', 'RMSbRel12',
-                         'RMSbRel13', 'RMSbRel23'])
-    # Print the feature ranking
-    print("Feature ranking:")
-    for f in range(X.shape[1]):
-        print("%d. %s (%f)" % (f + 1, features[indices[f]], importances[indices[f]]))
-
-    # Plot the feature importances
-    plt.figure()
-    plt.title("Feature importances")
-    plt.bar(range(X.shape[1]), importances[indices],
-           color="r", align="center")
-    plt.xticks(range(X.shape[1]), features[indices])
-    plt.xlim([-1, X.shape[1]])
-    plt.show()
 
 
 def train():
