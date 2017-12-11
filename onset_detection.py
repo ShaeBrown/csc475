@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import librosa
-import librosa.display
 import sys
 import numpy as np
 
