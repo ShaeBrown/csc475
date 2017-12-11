@@ -3,6 +3,7 @@ click==6.7
 cycler==0.10.0
 decorator==4.1.2
 Flask==0.12.2
+gunicorn==19.7.1
 itsdangerous==0.24
 Jinja2==2.10
 joblib==0.11
