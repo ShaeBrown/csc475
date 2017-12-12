@@ -22,8 +22,6 @@ def allowed_file(filename):
 @app.route('/song/<filename>')
 def display_drum(filename):
     path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    print(path)
-    print(os.path.isfile(path))
     song, sr = librosa.core.load(path)
     return render_template("music.html", file_name=url_for('static', filename=os.path.join('uploads', filename)),
                            drum_events=annotator.get_drum_prediction_times(song, sr))
