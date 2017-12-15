@@ -1,1 +1,2 @@
-http://ca.archive.ubuntu.com/ubuntu/pool/universe/f/ffmpeg/ffmpeg_2.8.11-0ubuntu0.16.04.1_amd64.deb
+ffmpeg
+libavdevice-dev
