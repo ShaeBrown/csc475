@@ -26,4 +26,4 @@ six==1.11.0
 tabulate==0.8.2
 urllib3==1.22
 Werkzeug==0.13
-+git+https://github.com/ShaeBrown/audioread.git@debug-ffdec
+git+https://github.com/ShaeBrown/audioread.git@debug-ffdec
